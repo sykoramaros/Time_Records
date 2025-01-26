@@ -64,9 +64,17 @@
               "target": "Package",
               "version": "[8.0.8, )"
             },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.12, )"
+            },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.12, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
               "target": "Package",
               "version": "[8.0.12, )"
             },
@@ -101,6 +109,10 @@
               "version": "[7.2.0, )"
             },
             "System.Linq": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Threading.Tasks": {
               "target": "Package",
               "version": "[4.3.0, )"
             }
