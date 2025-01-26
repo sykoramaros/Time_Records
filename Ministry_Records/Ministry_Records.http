@@ -1,0 +1,6 @@
+@Ministry_Records_HostAddress = http://localhost:5113
+
+GET {{Ministry_Records_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
