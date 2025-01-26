@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Ministry_Records;
+using Ministry_Records.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MonsterAspDbConnection"))
     );
 });
+
+builder.Services.AddScoped<RecordService>();
 
 
 builder.Services.AddEndpointsApiExplorer();

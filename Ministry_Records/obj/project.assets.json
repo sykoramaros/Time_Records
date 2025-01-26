@@ -8189,7 +8189,9 @@
       "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore >= 8.0.12",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.12",
       "Microsoft.AspNetCore.OpenApi >= 8.0.8",
+      "Microsoft.EntityFrameworkCore >= 8.0.12",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.12",
+      "Microsoft.EntityFrameworkCore.Relational >= 8.0.12",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.12",
       "Newtonsoft.Json >= 13.0.3",
       "Pomelo.EntityFrameworkCore.Lolita.MySql >= 6.0.5",
@@ -8197,7 +8199,8 @@
       "Pomelo.EntityFrameworkCore.MySql.Design >= 1.1.2",
       "Swashbuckle.AspNetCore >= 6.4.0",
       "Swashbuckle.AspNetCore.Annotations >= 7.2.0",
-      "System.Linq >= 4.3.0"
+      "System.Linq >= 4.3.0",
+      "System.Threading.Tasks >= 4.3.0"
     ]
   },
   "packageFolders": {
@@ -8263,9 +8266,17 @@
             "target": "Package",
             "version": "[8.0.8, )"
           },
+          "Microsoft.EntityFrameworkCore": {
+            "target": "Package",
+            "version": "[8.0.12, )"
+          },
           "Microsoft.EntityFrameworkCore.Design": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "suppressParent": "All",
+            "target": "Package",
+            "version": "[8.0.12, )"
+          },
+          "Microsoft.EntityFrameworkCore.Relational": {
             "target": "Package",
             "version": "[8.0.12, )"
           },
@@ -8300,6 +8311,10 @@
             "version": "[7.2.0, )"
           },
           "System.Linq": {
+            "target": "Package",
+            "version": "[4.3.0, )"
+          },
+          "System.Threading.Tasks": {
             "target": "Package",
             "version": "[4.3.0, )"
           }
