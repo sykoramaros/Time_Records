@@ -106,19 +106,16 @@ public partial class RecordService {
         await dbContext.SaveChangesAsync();
     }
     
-     
-    
-    
-    internal async Task DeleteRecordByDateAsync(DateOnly date) {
-        var recordToDelete = await dbContext.Records
-            .FirstOrDefaultAsync(r => r.Date == date);
-        dbContext.Records.Remove(recordToDelete);
-        await dbContext.SaveChangesAsync();
-    }
-    
     internal async Task DeleteRecordByIdAsync(int id) {
         var recordToDelete = await dbContext.Records
             .FindAsync(id);
+        dbContext.Records.Remove(recordToDelete);
+        await dbContext.SaveChangesAsync();
+    }
+
+    internal async Task DeleteRecordByDateAsync(DateOnly date) {
+        var recordToDelete = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.Date == date);
         dbContext.Records.Remove(recordToDelete);
         await dbContext.SaveChangesAsync();
     }

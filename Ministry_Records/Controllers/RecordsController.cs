@@ -70,6 +70,9 @@ public class RecordsController : ControllerBase {
     // jeste nefunguje i kdyz vraci kod 200
     [HttpPut("EditRecordById/{id}")]
     public async Task<IActionResult> EditRecordByIdAsync(int id, [FromBody] RecordDto editedRecord) {
+        if (!ModelState.IsValid) {
+            return BadRequest(error: ModelState);
+        }
         var recordToEdit = await recordService.GetRecordByIdAsync(id);
         if (recordToEdit == null) {
             return NotFound("Record not found");
@@ -81,10 +84,18 @@ public class RecordsController : ControllerBase {
         if (!ModelState.IsValid) {
             return BadRequest(error: ModelState);
         }
-        // await recordService.EditRecordByIdAsync(id, editedRecord);
-        return Ok();
+        await recordService.EditRecordByIdAsync(id, editedRecord);
+        return Ok(recordToEdit);
     }
     
-    
+    [HttpDelete("DeleteRecordById/{id}")]
+    public async Task<IActionResult> DeleteRecordByIdAsync(int id) {
+        var recordToDelete = await recordService.GetRecordByIdAsync(id);
+        if (recordToDelete == null) {
+            return NotFound("Record not found");
+        }
+        await recordService.DeleteRecordByIdAsync(id);
+        return Ok();
+    }
     
 }
