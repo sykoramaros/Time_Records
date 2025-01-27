@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Ministry_Records.DTO;
 using Ministry_Records.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,10 @@ public partial class RecordService {
             Id = recordDto.Id,
             Date = recordDto.Date,
             RecordTime = recordDto.RecordTime,
+            // pokud jsou zadany jen hodiny a minuty, automaticky se sekundy +00 pridaji 
+            // RecordTime = recordDto.RecordTime.Seconds == 0 ?
+            //     recordDto.RecordTime.Add(TimeSpan.FromSeconds(0)) :
+            //     recordDto.RecordTime,
             RecordStudy = recordDto.RecordStudy,
             Description = recordDto.Description
         };
@@ -37,7 +42,7 @@ public partial class RecordService {
         await dbContext.SaveChangesAsync();
     }
 
-    // internal IEnumerable<RecordDto> GetAllRecords() {
+// internal IEnumerable<RecordDto> GetAllRecords() {
     //     var allRecords = dbContext.Records;
     //
     //     var recordDtos = new List<RecordDto>();
@@ -79,11 +84,6 @@ public partial class RecordService {
             .Where(r => r.Date.Year == year)
             .Select(ModelToDto);
     }
-
-    internal async Task EditRecordByDateAsync(DateOnly date, RecordDto editedRecord) {
-        dbContext.Update(DtoToModel(editedRecord));
-        await dbContext.SaveChangesAsync();
-    }
     
     internal async Task<RecordDto> GetRecordByIdAsync(int id) {
         var recordToEdit = await dbContext.Records
@@ -93,12 +93,22 @@ public partial class RecordService {
         }
         return ModelToDto(recordToEdit);
     }
-
-    internal async Task EditRecordByIdAsync(int id, RecordDto editedRecord) {
+    
+    // haze error 400
+    internal async Task EditRecordByDateAsync(DateOnly date, RecordDto editedRecord) {
         dbContext.Update(DtoToModel(editedRecord));
         await dbContext.SaveChangesAsync();
     }
 
+    // jeste nefunguje i kdyz vraci kod 200
+    internal async Task EditRecordByIdAsync(int id, RecordDto editedRecord) {
+        dbContext.Update(DtoToModel(editedRecord));
+        await dbContext.SaveChangesAsync();
+    }
+    
+     
+    
+    
     internal async Task DeleteRecordByDateAsync(DateOnly date) {
         var recordToDelete = await dbContext.Records
             .FirstOrDefaultAsync(r => r.Date == date);
