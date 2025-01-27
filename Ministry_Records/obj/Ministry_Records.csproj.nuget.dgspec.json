@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/marosh/RiderProjects/C#/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj": {}
+    "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj": {}
   },
   "projects": {
-    "/Users/marosh/RiderProjects/C#/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj": {
+    "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/marosh/RiderProjects/C#/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj",
+        "projectUniqueName": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj",
         "projectName": "Ministry_Records",
-        "projectPath": "/Users/marosh/RiderProjects/C#/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj",
+        "projectPath": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/Ministry_Records.csproj",
         "packagesPath": "/Users/marosh/.nuget/packages/",
-        "outputPath": "/Users/marosh/RiderProjects/C#/vlastni/Ministry_Records/Ministry_Records/obj/",
+        "outputPath": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/marosh/.nuget/NuGet/NuGet.Config"
