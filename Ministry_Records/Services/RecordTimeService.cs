@@ -20,6 +20,23 @@ public class RecordTimeService {
             Minutes = totalTime.Minutes
         };
     }
+    
+    public async Task<TimeFormatDto> SumMinistryYearTotalRecordTimeAsync(int chosenYear) {
+        var records = await dbContext.Records.ToListAsync();
+        
+        var startMinistryYear = new DateOnly(chosenYear, 9, 1);
+        var endMinistryYear = new DateOnly(chosenYear + 1, 8, 31);
+        
+        var ministryYearrecords = records
+            .Where(record => record.Date >= startMinistryYear && record.Date <= endMinistryYear)
+            .Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+
+        return new TimeFormatDto() 
+        { 
+            Hours = (int)ministryYearrecords.TotalHours,
+            Minutes = ministryYearrecords.Minutes
+        };
+    }
 
     public async Task<TimeFormatDto> SumMonthTotalRecordTimeAsync(DateOnly chosenMonthYear) {
         var records = await dbContext.Records.ToListAsync();
