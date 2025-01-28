@@ -98,4 +98,27 @@ public class RecordsController : ControllerBase {
         return Ok();
     }
     
+    [HttpGet("SumDayTotalRecordTime")]
+    public async Task<ActionResult<TimeSpan>> SumDayTotalRecordTimeAsync() {
+        var sum = await recordService.SumDayTotalRecordTimeAsync();
+        return Ok(sum);
+    }
+    
+    [HttpGet("SumHoursTotalRecordTimeInHoursAsStringAsync")]
+    public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsStringAsync() {
+        var sum = await recordService.SumHoursTotalRecordTimeInHoursAsStringAsync();
+        return Ok(sum);
+    }
+    
+    [HttpGet("SumHoursTotalRecordTimeInHoursAsIntAsync")]
+    public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsIntAsync() {
+        var sum = await recordService.SumHoursTotalRecordTimeInHoursAsIntAsync();
+        return Ok(sum);
+    }
+    
+    [HttpGet("SumHoursTotalRecordTimeInHoursAsDoubleAsync")]
+    public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsDoubleAsync() {
+        var sum = await recordService.SumHoursTotalRecordTimeInHoursAsDoubleAsync();
+        return Ok(sum);
+    }
 }

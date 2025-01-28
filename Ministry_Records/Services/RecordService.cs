@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ministry_Records.DTO;
 using Ministry_Records.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Scaffolding;
 using Pomelo.EntityFrameworkCore.MySql;
 
 namespace Ministry_Records.Services;
@@ -99,8 +100,7 @@ public partial class RecordService {
         dbContext.Update(DtoToModel(editedRecord));
         await dbContext.SaveChangesAsync();
     }
-
-    // jeste nefunguje i kdyz vraci kod 200
+    
     internal async Task EditRecordByIdAsync(int id, RecordDto editedRecord) {
         dbContext.Update(DtoToModel(editedRecord));
         await dbContext.SaveChangesAsync();
@@ -113,10 +113,63 @@ public partial class RecordService {
         await dbContext.SaveChangesAsync();
     }
 
+    // zatim nefunkcni
     internal async Task DeleteRecordByDateAsync(DateOnly date) {
         var recordToDelete = await dbContext.Records
             .FirstOrDefaultAsync(r => r.Date == date);
         dbContext.Records.Remove(recordToDelete);
         await dbContext.SaveChangesAsync();
+    }
+    
+    // public async Task<TimeSpan> SumTotalRecordTimeAsync() {
+    //     // Načítáme celkový čas v "Ticks"
+    //     var totalTicks = await dbContext.Records
+    //         .SumAsync(r => (long?)r.RecordTime.Ticks ?? 0); // Převod na nullable long
+    //
+    //     // Převod Ticks zpět na TimeSpan
+    //     return TimeSpan.FromTicks(totalTicks);
+    // }
+    
+    public async Task<TimeSpan> SumDayTotalRecordTimeAsync() {
+        // Načteme data z databáze
+        var records = await dbContext.Records
+            .Where(r => r.RecordTime != null) // Filtrování null hodnot
+            .ToListAsync(); // Načteme všechny záznamy do paměti
+        // Vypočítáme součet minut na straně klienta
+        var totalMinutes = records
+            .Sum(r => r.RecordTime.TotalMinutes); // Používáme TotalMinutes pro součet minut
+        // Převod zpět na TimeSpan
+        return TimeSpan.FromMinutes(totalMinutes);
+    }
+
+// Řešení 1: Načtení dat do paměti a následný výpočet
+    public async Task<string> SumHoursTotalRecordTimeInHoursAsStringAsync()
+    {
+        var records = await dbContext.Records.ToListAsync();
+        var totalTime = records.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+    
+        int hours = (int)totalTime.TotalHours;
+        int minutes = totalTime.Minutes;
+    
+        return $"{hours} hodin {minutes} minut";
+    }
+    
+    public async Task<(int hours, int minutes)> SumHoursTotalRecordTimeInHoursAsIntAsync()
+    {
+        var records = await dbContext.Records.ToListAsync();
+        var totalTime = records.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+    
+        int hours = (int)totalTime.TotalHours;
+        int minutes = totalTime.Minutes;
+    
+        return (hours, minutes);
+    }
+    
+    public async Task<double> SumHoursTotalRecordTimeInHoursAsDoubleAsync()
+    {
+        var records = await dbContext.Records.ToListAsync();
+        var totalTime = records.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+    
+        return totalTime.TotalHours;
     }
 }
