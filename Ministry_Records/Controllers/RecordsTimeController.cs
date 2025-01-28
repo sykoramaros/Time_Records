@@ -18,6 +18,12 @@ public class RecordsTimeController : ControllerBase {
         return Ok(sum);
     }
     
+    [HttpGet("SumMinistryYearTotalRecordTime")]
+    public async Task<ActionResult<(int hours, int minutes)>> SumMinistryYearTotalRecordTimeAsync(int chosenYear) {
+        var sum = await recordTimeService.SumMinistryYearTotalRecordTimeAsync(chosenYear);
+        return Ok(sum);
+    }
+    
     [HttpGet("SumMonthTotalRecordTime")]
     public async Task<ActionResult<(int hours, int minutes)>> SumMonthTotalRecordTimeAsync(DateOnly chosenMonthYear) {
         var sum = await recordTimeService.SumMonthTotalRecordTimeAsync(chosenMonthYear);
