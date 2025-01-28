@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
 });
 
 builder.Services.AddScoped<RecordService>();
+builder.Services.AddScoped<RecordTimeService>();
 
 
 builder.Services.AddEndpointsApiExplorer();
