@@ -23,4 +23,12 @@ public class RecordsTimeController : ControllerBase {
         var sum = await recordTimeService.SumMonthTotalRecordTimeAsync(chosenMonthYear);
         return Ok(sum);
     }
+    
+    [HttpGet("SumWeekTotalRecordTime")]
+    public async Task<ActionResult<(int hours, int minutes)>> SumWeekTotalRecordTimeAsync(DateOnly chosenDay) {
+        var sum = await recordTimeService.SumWeekTotalRecordTimeAsync(chosenDay);
+        return Ok(sum);
+    }
+    
+    
 }

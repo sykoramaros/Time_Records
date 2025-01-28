@@ -34,4 +34,29 @@ public class RecordTimeService {
             Minutes = chosenMonthRecords.Minutes
         };
     }
+    
+    public async Task<TimeFormatDto> SumWeekTotalRecordTimeAsync(DateOnly chosenDay) {
+        var records = await dbContext.Records.ToListAsync();
+        // Převedeme DayOfWeek na hodnotu, kde pondělí = 1, neděle = 7
+        int dayOfWeek;
+        if (chosenDay.DayOfWeek == DayOfWeek.Sunday) {
+            dayOfWeek = 7;
+        } else {
+            dayOfWeek = (int)chosenDay.DayOfWeek;
+        }
+    
+        // Vypočítáme pondělí daného týdne
+        var startOfWeek = chosenDay.AddDays(1 - dayOfWeek);
+        var endOfWeek = startOfWeek.AddDays(7);
+
+        var chosenWeekRecords = records
+            .Where(record => record.Date >= startOfWeek && record.Date < endOfWeek)
+            .Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+
+        return new TimeFormatDto() 
+        { 
+            Hours = (int)chosenWeekRecords.TotalHours,
+            Minutes = chosenWeekRecords.Minutes
+        };
+    }
 }
