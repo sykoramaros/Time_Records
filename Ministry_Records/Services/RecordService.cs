@@ -2,12 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Ministry_Records.DTO;
 using Ministry_Records.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Scaffolding;
-using Pomelo.EntityFrameworkCore.MySql;
 
 namespace Ministry_Records.Services;
 
-public partial class RecordService {
+public class RecordService {
     private ApplicationDbContext dbContext;
 
     public RecordService(ApplicationDbContext dbContext) {
@@ -143,8 +141,7 @@ public partial class RecordService {
     }
 
 // Řešení 1: Načtení dat do paměti a následný výpočet
-    public async Task<string> SumHoursTotalRecordTimeInHoursAsStringAsync()
-    {
+    public async Task<string> SumHoursTotalRecordTimeInHoursAsStringAsync() {
         var records = await dbContext.Records.ToListAsync();
         var totalTime = records.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
     
@@ -154,8 +151,7 @@ public partial class RecordService {
         return $"{hours} hodin {minutes} minut";
     }
     
-    public async Task<(int hours, int minutes)> SumHoursTotalRecordTimeInHoursAsIntAsync()
-    {
+    public async Task<(int hours, int minutes)> SumHoursTotalRecordTimeInHoursAsIntAsync() {
         var records = await dbContext.Records.ToListAsync();
         var totalTime = records.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
     
@@ -165,8 +161,7 @@ public partial class RecordService {
         return (hours, minutes);
     }
     
-    public async Task<double> SumHoursTotalRecordTimeInHoursAsDoubleAsync()
-    {
+    public async Task<double> SumHoursTotalRecordTimeInHoursAsDoubleAsync() {
         var records = await dbContext.Records.ToListAsync();
         var totalTime = records.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
     
