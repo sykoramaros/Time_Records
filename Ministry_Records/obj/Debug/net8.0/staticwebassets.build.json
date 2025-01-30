@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "21q96zvS1FxJ95P7ZfSiavOs+TQ+VGT9IImFhA7A33Y=",
+  "Hash": "xtS+SMKB2pxP0GiVyVt8ide3AV4f3use2uAGcFN1qPk=",
   "Source": "Ministry_Records",
   "BasePath": "_content/Ministry_Records",
   "Mode": "Default",
@@ -47,10 +47,10 @@
       "OriginalItemSpec": "/Users/marosh/.nuget/packages/microsoft.aspnetcore.components.quickgrid/8.0.12/staticwebassets/QuickGrid.razor.js"
     },
     {
-      "Identity": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/obj/Debug/net8.0/scopedcss/bundle/Ministry_Records.styles.css",
+      "Identity": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records_Csharp/Ministry_Records/obj/Debug/net8.0/scopedcss/bundle/Ministry_Records.styles.css",
       "SourceId": "Ministry_Records",
       "SourceType": "Computed",
-      "ContentRoot": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/obj/Debug/net8.0/scopedcss/bundle/",
+      "ContentRoot": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records_Csharp/Ministry_Records/obj/Debug/net8.0/scopedcss/bundle/",
       "BasePath": "_content/Ministry_Records",
       "RelativePath": "Ministry_Records.styles.css",
       "AssetKind": "All",
@@ -63,7 +63,7 @@
       "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records/obj/Debug/net8.0/scopedcss/bundle/Ministry_Records.styles.css"
+      "OriginalItemSpec": "/Users/marosh/RiderProjects/ASPNET/vlastni/Ministry_Records/Ministry_Records_Csharp/Ministry_Records/obj/Debug/net8.0/scopedcss/bundle/Ministry_Records.styles.css"
     }
   ]
 }
