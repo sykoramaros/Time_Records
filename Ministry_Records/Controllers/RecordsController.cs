@@ -13,7 +13,7 @@ public class RecordsController : ControllerBase {
         this.recordService = recordService;
     }
     
-    [HttpGet("getAllRecords")]
+    [HttpGet("GetAllRecords")]
     public ActionResult<IEnumerable<RecordDto>> GetAllRecords() {
         var records = recordService.GetAllRecords();
         if (records == null || !records.Any()) {
@@ -22,9 +22,18 @@ public class RecordsController : ControllerBase {
         return Ok(records);
     }
     
-    [HttpGet("getById/{id}")]
+    [HttpGet("GetRecordById/{id}")]
     public async Task<ActionResult<RecordDto>> GetRecordByIdAsync(int id) {
         var record = await recordService.GetRecordByIdAsync(id);
+        if (record == null) {
+            return NotFound("Record not found");
+        }
+        return Ok(record);
+    }
+    
+    [HttpGet("GetRecordByDate/{date}")]
+    public async Task<ActionResult<RecordDto>> GetRecordByDateAsync(DateOnly date) {
+        var record = await recordService.GetRecordByDateAsync(date);
         if (record == null) {
             return NotFound("Record not found");
         }
@@ -40,7 +49,7 @@ public class RecordsController : ControllerBase {
     //     "description": "zkouska swagger s pocatecni nulou"
     // }
     
-    [HttpPost("createRecord")]
+    [HttpPost("CreateRecord")]
     public async Task<ActionResult> CreateRecordAsync([FromBody] RecordDto recordDto) {
         if (!ModelState.IsValid) {
             return BadRequest(ModelState);
@@ -61,31 +70,10 @@ public class RecordsController : ControllerBase {
         return Ok();
     }
     
-    // [HttpPut("EditRecordById/{id}")]
-    // public async Task<ActionResult> EditRecordByIdAsync(int id, RecordDto recordDto) {
-    //     await recordService.EditRecordByIdAsync(id, recordDto);
-    //     return Ok();
-    // }
-    
-    // jeste nefunguje i kdyz vraci kod 200
     [HttpPut("EditRecordById/{id}")]
-    public async Task<IActionResult> EditRecordByIdAsync(int id, [FromBody] RecordDto editedRecord) {
-        if (!ModelState.IsValid) {
-            return BadRequest(error: ModelState);
-        }
-        var recordToEdit = await recordService.GetRecordByIdAsync(id);
-        if (recordToEdit == null) {
-            return NotFound("Record not found");
-        }
-        recordToEdit.Date = editedRecord.Date;
-        recordToEdit.RecordTime = editedRecord.RecordTime;
-        recordToEdit.RecordStudy = editedRecord.RecordStudy;
-        recordToEdit.Description = editedRecord.Description;
-        if (!ModelState.IsValid) {
-            return BadRequest(error: ModelState);
-        }
-        await recordService.EditRecordByIdAsync(id, editedRecord);
-        return Ok(recordToEdit);
+    public async Task<ActionResult> EditRecordByIdAsync(int id, RecordDto recordDto) {
+        await recordService.EditRecordByIdAsync(id, recordDto);
+        return Ok();
     }
     
     [HttpDelete("DeleteRecordById/{id}")]
@@ -95,6 +83,16 @@ public class RecordsController : ControllerBase {
             return NotFound("Record not found");
         }
         await recordService.DeleteRecordByIdAsync(id);
+        return Ok();
+    }
+    
+    [HttpDelete("DeleteRecordByDate/{date}")]
+    public async Task<IActionResult> DeleteRecordByDateAsync(DateOnly date) {
+        var recordToDelete = await recordService.GetRecordByDateAsync(date);
+        if (recordToDelete == null) {
+            return NotFound("Record not found");
+        }
+        await recordService.DeleteRecordByDateAsync(date);
         return Ok();
     }
     
