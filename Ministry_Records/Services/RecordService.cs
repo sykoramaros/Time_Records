@@ -57,6 +57,23 @@ public class RecordService {
         return dbContext.Records
             .Select(ModelToDto);
     }
+    internal async Task<RecordDto> GetRecordByIdAsync(int id) {
+        var recordToEdit = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.Id == id);
+        if (recordToEdit == null) {
+            return null;
+        }
+        return ModelToDto(recordToEdit);
+    }
+    
+    internal async Task<RecordDto> GetRecordByDateAsync(DateOnly date) {
+        var recordToEdit = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.Date == date);
+        if (recordToEdit == null) {
+            return null;
+        }
+        return ModelToDto(recordToEdit);
+    }
 
     public IEnumerable<RecordDto> GetAllRecordsByDay(DateOnly chosenDate) {
         return dbContext.Records
@@ -84,23 +101,31 @@ public class RecordService {
             .Select(ModelToDto);
     }
     
-    internal async Task<RecordDto> GetRecordByIdAsync(int id) {
-        var recordToEdit = await dbContext.Records
-            .FirstOrDefaultAsync(r => r.Id == id);
-        if (recordToEdit == null) {
-            return null;
-        }
-        return ModelToDto(recordToEdit);
-    }
-    
-    // haze error 400
     internal async Task EditRecordByDateAsync(DateOnly date, RecordDto editedRecord) {
-        dbContext.Update(DtoToModel(editedRecord));
+        var recordToEdit = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.Date == date);
+        if (recordToEdit == null) {
+            return;
+        }
+        recordToEdit.Date = editedRecord.Date;
+        recordToEdit.RecordTime = editedRecord.RecordTime;
+        recordToEdit.RecordStudy = editedRecord.RecordStudy;
+        recordToEdit.Description = editedRecord.Description;
+        dbContext.Update(recordToEdit);
         await dbContext.SaveChangesAsync();
     }
     
     internal async Task EditRecordByIdAsync(int id, RecordDto editedRecord) {
-        dbContext.Update(DtoToModel(editedRecord));
+        var recordToEdit = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.Id == id);
+        if (recordToEdit == null) {
+            return;
+        }
+        recordToEdit.Date = editedRecord.Date;
+        recordToEdit.RecordTime = editedRecord.RecordTime;
+        recordToEdit.RecordStudy = editedRecord.RecordStudy;
+        recordToEdit.Description = editedRecord.Description;
+        dbContext.Update(recordToEdit);
         await dbContext.SaveChangesAsync();
     }
     
