@@ -8,5 +8,4 @@ public class ApplicationDbContext : IdentityDbContext<AppUser> { // Dědění z 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
     
     public DbSet<Record> Records { get; set; }
-    
 }
