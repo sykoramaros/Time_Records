@@ -51,12 +51,13 @@ public class UsersController : ControllerBase {
                 return BadRequest("User with this email already exists");
             }
             AppUser appUser = new AppUser {
+                UserName = newUser.Name,
                 Email = newUser.Email,
-                UserName = newUser.Email
+                PhoneNumber = newUser.PhoneNumber
             };
             IdentityResult result = await userManager.CreateAsync(appUser, newUser.Password);
             if (result.Succeeded) {
-                return Ok();
+                return Ok(new {success = true, user = new {appUser.Id, appUser.UserName, appUser.Email, appUser.PhoneNumber}});
             }
             return BadRequest(result.Errors);
         } else {
