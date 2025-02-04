@@ -32,7 +32,7 @@ public class AccountController : ControllerBase {
         return Ok(loginDto);
     }
 
-    [HttpPost("login")]
+    [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto) {
         if (ModelState.IsValid) {
             AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
@@ -49,12 +49,17 @@ public class AccountController : ControllerBase {
         return Unauthorized();
     }
 
-    [HttpPost("jwt-login")]
+    [HttpPost("Jwt-login")]
     public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
         if (ModelState.IsValid) {
             AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
             if (appUser != null) {
-                var signInResult = await signInManager.PasswordSignInAsync(appUser, loginDto.Password, false, false);
+                var signInResult = await signInManager.PasswordSignInAsync(
+                    appUser,
+                    loginDto.Password,
+                    isPersistent: false,
+                    lockoutOnFailure: false
+                    );
                 if (signInResult.Succeeded) {
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.Name, appUser.UserName),
@@ -63,38 +68,36 @@ public class AccountController : ControllerBase {
                     foreach (var role in userRoles) {
                         claims.Add(new Claim(ClaimTypes.Role, role));
                     }
-
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]
-                                                                              ?? throw new InvalidOperationException(
-                                                                                  "JWT:SecretKey not found")));
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT:SecretKey not found")));
                     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                    var token = new JwtSecurityToken(configuration["Jwt:Issuer"],
-                        configuration["Jwt:Audience"],
+                    var token = new JwtSecurityToken(
+                        issuer: configuration["Jwt:Issuer"],
+                        audience: configuration["Jwt:Audience"],
                         claims: claims,
                         expires: DateTime.Now.AddMinutes(10),
-                        signingCredentials: credentials);
+                        signingCredentials: credentials
+                        );
                     var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
                     return Ok(new {
-                        token = tokenString, message = "JWT Login successful", returnUrl = loginDto.ReturnUrl ?? "/"
+                        token = tokenString,
+                        message = "JWT Login successful",
+                        returnUrl = loginDto.ReturnUrl ?? "/"
                     });
                 }
-
                 return Unauthorized(new { message = "Invalid credentials" });
             }
-
             return Unauthorized(new { message = "User not found" });
         }
-
         return BadRequest(new { message = "Invalid model state", errors = ModelState });
     }
 
-    [HttpPost("logout")]
+    [HttpPost("Logout")]
     public async Task<IActionResult> Logout() {
         await signInManager.SignOutAsync();
         return Ok(new { message = "Logout successful", returnUrl = "/" });
     }
 
-    [HttpGet("access-denied")]
+    [HttpGet("Access-denied")]
     public IActionResult AccessDenied() {
         return Unauthorized(new { message = "Access denied", returnUrl = "/forbidden" });
     }
