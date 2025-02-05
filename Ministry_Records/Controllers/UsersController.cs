@@ -25,7 +25,7 @@ public class UsersController : ControllerBase {
         return Ok(users);
     }
     
-    [HttpPost("GetUserById/{id}")]
+    [HttpGet("GetUserById/{id}")]
     public async Task<IActionResult> GetUserById(string id) {
         var user = await userManager.FindByIdAsync(id);
         if (user == null) {
@@ -34,7 +34,7 @@ public class UsersController : ControllerBase {
         return Ok(user);
     }
     
-    [HttpGet("GetByEmail/{email}")]
+    [HttpGet("GetByUserEmail/{email}")]
     public async Task<IActionResult> GetUserByEmail(string email) {
         var user = await userManager.FindByEmailAsync(email);
         if (user == null) {
@@ -73,6 +73,7 @@ public class UsersController : ControllerBase {
         }
         userToEdit.UserName = editedUser.Name;
         userToEdit.Email = editedUser.Email;
+        userToEdit.PhoneNumber = editedUser.PhoneNumber;
         IdentityResult result = await userManager.UpdateAsync(userToEdit);
         if (result.Succeeded) {
             return Ok();
