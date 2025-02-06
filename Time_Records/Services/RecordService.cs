@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Time_Records.DTO;
 using Time_Records.Models;
@@ -7,9 +8,22 @@ namespace Time_Records.Services;
 
 public class RecordService {
     private ApplicationDbContext dbContext;
+    private UserManager<AppUser> userManager;
+    private IHttpContextAccessor httpContextAccessor;
 
-    public RecordService(ApplicationDbContext dbContext) {
+    // public RecordService(ApplicationDbContext dbContext) {
+    //     this.dbContext = dbContext;
+    // }
+
+    public RecordService(ApplicationDbContext dbContext, UserManager<AppUser> userManager) {
         this.dbContext = dbContext;
+        this.userManager = userManager;
+    }
+
+    public RecordService(ApplicationDbContext dbContext, UserManager<AppUser> userManager, IHttpContextAccessor httpContextAccessor) {
+        this.dbContext = dbContext;
+        this.userManager = userManager;
+        this.httpContextAccessor = httpContextAccessor;
     }
 
     private static RecordDto ModelToDto(Record record) {
@@ -18,7 +32,8 @@ public class RecordService {
             Date = record.Date,
             RecordTime = record.RecordTime,
             RecordStudy = record.RecordStudy,
-            Description = record.Description
+            Description = record.Description,
+            IdentityUserId = record.IdentityUserId
         };
     }
 
@@ -32,26 +47,26 @@ public class RecordService {
             //     recordDto.RecordTime.Add(TimeSpan.FromSeconds(0)) :
             //     recordDto.RecordTime,
             RecordStudy = recordDto.RecordStudy,
-            Description = recordDto.Description
+            Description = recordDto.Description,
+            IdentityUserId = recordDto.IdentityUserId
         };
     }
 
-    public async Task CreateRecordAsync(RecordDto recordDto) {
-        await dbContext.Records.AddAsync(DtoToModel(recordDto));
-        await dbContext.SaveChangesAsync();
-    }
-
-// internal IEnumerable<RecordDto> GetAllRecords() {
-    //     var allRecords = dbContext.Records;
-    //
-    //     var recordDtos = new List<RecordDto>();
-    //     foreach (var record in allRecords) {
-    //         recordDtos.Add(ModelToDto(record));
-    //     }
-    //     return recordDtos;
+    // public async Task CreateRecordAsync(RecordDto recordDto) {
+    //     await dbContext.Records.AddAsync(DtoToModel(recordDto));
+    //     await dbContext.SaveChangesAsync();
     // }
 
-    // GetAllRecords LINQ zkracena rychlejsi varianta se stejnym vysledkem 
+    public async Task CreateRecordAsync(RecordDto recordDto) {
+        var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+        if (user == null) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var record = DtoToModel(recordDto);
+        record.IdentityUserId = user.Id;
+        await dbContext.Records.AddAsync(record);
+        await dbContext.SaveChangesAsync();
+    }
     
     internal IEnumerable<RecordDto> GetAllRecords() {
         return dbContext.Records
