@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Time_Records.DTO;
@@ -68,22 +69,109 @@ public class RecordService {
         await dbContext.SaveChangesAsync();
     }
     
-    internal IEnumerable<RecordDto> GetAllRecords() {
-        return dbContext.Records
-            .Select(ModelToDto);
+    public async Task CreateRecordQueryAsync([FromQuery] string userId, RecordDto recordDto) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var record = DtoToModel(recordDto);
+        record.IdentityUserId = userId;
+        await dbContext.Records.AddAsync(record);
+        await dbContext.SaveChangesAsync();
     }
+    
+    // internal IEnumerable<RecordDto> GetAllRecords() {
+    //     return dbContext.Records
+    //         .Select(ModelToDto);
+    // }
+    
+    // internal IEnumerable<RecordDto> GetAllRecords() {
+    //     var user = userManager.GetUserAsync(httpContextAccessor.HttpContext.User).Result;
+    //     if (user == null) {
+    //         throw new UnauthorizedAccessException("User not found");
+    //     }
+    //     return dbContext.Records
+    //         .Where(r => r.IdentityUserId == user.Id)
+    //         .Select(ModelToDto);
+    // }
+    
+    internal async Task<IEnumerable<RecordDto>> GetAllRecords() {
+        // var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+        var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"Decoded userId: {userId}");
+        if (userId == null) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        return dbContext.Records
+            .Where(r => r.IdentityUserId == userId)
+            .Select(ModelToDto)
+            .AsEnumerable();
+    }
+    
+    internal async Task<IEnumerable<RecordDto>> GetAllRecordsQuery([FromQuery] string userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException("User not found");
+        }
+
+        return dbContext.Records
+            .Where(r => r.IdentityUserId == userId)
+            .Select(ModelToDto)
+            .AsEnumerable();
+    }
+    
+    
+    
+    // internal async Task<RecordDto> GetRecordByIdAsync(int id) {
+    //     var recordToEdit = await dbContext.Records
+    //         .FirstOrDefaultAsync(r => r.Id == id);
+    //     if (recordToEdit == null) {
+    //         return null;
+    //     }
+    //     return ModelToDto(recordToEdit);
+    // }
+    
     internal async Task<RecordDto> GetRecordByIdAsync(int id) {
+        var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+        if (user == null) {
+            throw new UnauthorizedAccessException("User not found");
+        }
         var recordToEdit = await dbContext.Records
-            .FirstOrDefaultAsync(r => r.Id == id);
+            .FirstOrDefaultAsync(r => r.Id == id && r.IdentityUserId == user.Id);
         if (recordToEdit == null) {
             return null;
         }
         return ModelToDto(recordToEdit);
     }
     
+    // internal async Task<RecordDto> GetRecordByDateAsync(DateOnly date) {
+    //     var recordToEdit = await dbContext.Records
+    //         .FirstOrDefaultAsync(r => r.Date == date);
+    //     if (recordToEdit == null) {
+    //         return null;
+    //     }
+    //     return ModelToDto(recordToEdit);
+    // }
+    
     internal async Task<RecordDto> GetRecordByDateAsync(DateOnly date) {
+        var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+        if (user == null) {
+            throw new UnauthorizedAccessException("User not found");
+        }
         var recordToEdit = await dbContext.Records
-            .FirstOrDefaultAsync(r => r.Date == date);
+            .FirstOrDefaultAsync(r => r.Date == date && r.IdentityUserId == user.Id);
+        if (recordToEdit == null) {
+            return null;
+        }
+        return ModelToDto(recordToEdit);
+    }
+    
+    internal async Task<RecordDto> GetRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var recordToEdit = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.IdentityUserId == userId && r.Date == date);
         if (recordToEdit == null) {
             return null;
         }
@@ -130,6 +218,23 @@ public class RecordService {
         await dbContext.SaveChangesAsync();
     }
     
+    internal async Task EditRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date, RecordDto editedRecord) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var recordToEdit = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.IdentityUserId == userId && r.Date == date);
+        if (recordToEdit == null) {
+            return;
+        }
+        recordToEdit.Date = editedRecord.Date;
+        recordToEdit.RecordTime = editedRecord.RecordTime;
+        recordToEdit.RecordStudy = editedRecord.RecordStudy;
+        recordToEdit.Description = editedRecord.Description;
+        dbContext.Update(recordToEdit);
+        await dbContext.SaveChangesAsync();
+    }
+    
     internal async Task EditRecordByIdAsync(int id, RecordDto editedRecord) {
         var recordToEdit = await dbContext.Records
             .FirstOrDefaultAsync(r => r.Id == id);
@@ -157,6 +262,18 @@ public class RecordService {
             .FirstOrDefaultAsync(r => r.Date == date);
         dbContext.Records.Remove(recordToDelete);
         await dbContext.SaveChangesAsync();
+    }
+    
+    internal async Task DeleteRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var recordToDelete = await dbContext.Records
+            .FirstOrDefaultAsync(r => r.IdentityUserId == userId && r.Date == date);
+        if (recordToDelete != null) {
+            dbContext.Records.Remove(recordToDelete);
+            await dbContext.SaveChangesAsync();
+        }
     }
     
     // public async Task<TimeSpan> SumTotalRecordTimeAsync() {
