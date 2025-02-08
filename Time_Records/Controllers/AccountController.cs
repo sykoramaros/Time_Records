@@ -63,6 +63,9 @@ public class AccountController : ControllerBase {
                 if (signInResult.Succeeded) {
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.Name, appUser.UserName),
+                        new Claim(ClaimTypes.NameIdentifier, appUser.Id),
+                        new Claim(ClaimTypes.Email, appUser.Email),
+                        new Claim(ClaimTypes.MobilePhone, appUser.PhoneNumber ?? "")
                     };
                     var userRoles = await userManager.GetRolesAsync(appUser);
                     foreach (var role in userRoles) {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Time_Records.DTO;
 using Time_Records.Services;
+using System.Linq;
 
 namespace Time_Records.Controllers;
 
@@ -13,10 +14,30 @@ public class RecordsController : ControllerBase {
         this.recordService = recordService;
     }
     
+    // [HttpGet("GetAllRecords")]
+    // public ActionResult<IEnumerable<RecordDto>> GetAllRecords() {
+    //     var records = recordService.GetAllRecords();
+    //     if (records == null || !records.Any()) {
+    //         return NotFound("No records found");
+    //     }
+    //     return Ok(records);
+    // }
+    
     [HttpGet("GetAllRecords")]
-    public ActionResult<IEnumerable<RecordDto>> GetAllRecords() {
-        var records = recordService.GetAllRecords();
+    public async Task<ActionResult<IEnumerable<RecordDto>>> GetAllRecords() {
+        var records = await recordService.GetAllRecords();
         if (records == null || !records.Any()) {
+            return NotFound("No records found");
+        }
+        return Ok(records);
+    }
+    
+    [HttpGet("GetAllRecordsQuery")]
+    public async Task<ActionResult<IEnumerable<RecordDto>>> GetAllRecordsQuery([FromQuery] string userId)
+    {
+        var records = await recordService.GetAllRecordsQuery(userId);
+        if (records == null || !records.Any())
+        {
             return NotFound("No records found");
         }
         return Ok(records);
@@ -34,6 +55,15 @@ public class RecordsController : ControllerBase {
     [HttpGet("GetRecordByDate/{date}")]
     public async Task<ActionResult<RecordDto>> GetRecordByDateAsync(DateOnly date) {
         var record = await recordService.GetRecordByDateAsync(date);
+        if (record == null) {
+            return NotFound("Record not found");
+        }
+        return Ok(record);
+    }
+    
+    [HttpGet("GetRecordByDateQuery")]
+    public async Task<ActionResult<RecordDto>> GetRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
+        var record = await recordService.GetRecordByDateQueryAsync(userId, date);
         if (record == null) {
             return NotFound("Record not found");
         }
@@ -63,11 +93,39 @@ public class RecordsController : ControllerBase {
         }
     }
     
+    [HttpPost("CreateRecordQuery")]
+    public async Task<ActionResult> CreateRecordQueryAsync([FromQuery] string userId, [FromBody] RecordDto recordDto) {
+        if (!ModelState.IsValid) {
+            return BadRequest(ModelState);
+        }
+        try {
+            await recordService.CreateRecordQueryAsync(userId, recordDto);
+            return Ok();
+        }
+        catch (Exception exception) {
+            return StatusCode(500, "An error occurred while creating the record: " + exception.Message);
+        }
+    }
+    
     // zatim haze error 400
     [HttpPut("EditRecordByDate/{date}")]
     public async Task<ActionResult> EditRecordByDateAsync(DateOnly date, RecordDto recordDto) {
         await recordService.EditRecordByDateAsync(date, recordDto);
         return Ok();
+    }
+    
+    [HttpPut("EditRecordByDateQuery")]
+    public async Task<ActionResult> EditRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date, RecordDto recordDto) {
+        try {
+            await recordService.EditRecordByDateQueryAsync(userId, date, recordDto);
+            return Ok();
+        }
+        catch (UnauthorizedAccessException) {
+            return Unauthorized();
+        }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
     }
     
     [HttpPut("EditRecordById/{id}")]
@@ -94,6 +152,20 @@ public class RecordsController : ControllerBase {
         }
         await recordService.DeleteRecordByDateAsync(date);
         return Ok();
+    }
+    
+    [HttpDelete("DeleteRecordByDateQuery")]
+    public async Task<ActionResult> DeleteRecordQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
+        try {
+            await recordService.DeleteRecordByDateQueryAsync(userId, date);
+            return Ok();
+        }
+        catch (UnauthorizedAccessException) {
+            return Unauthorized();
+        }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
     }
     
     [HttpGet("SumDayTotalRecordTime")]
