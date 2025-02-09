@@ -115,9 +115,9 @@ public class RecordsController : ControllerBase {
     }
     
     [HttpPut("EditRecordByDateQuery")]
-    public async Task<ActionResult> EditRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date, RecordDto recordDto) {
+    public async Task<ActionResult> EditRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date, [FromBody] RecordDto editedRecord) {
         try {
-            await recordService.EditRecordByDateQueryAsync(userId, date, recordDto);
+            await recordService.EditRecordByDateQueryAsync(userId, date, editedRecord);
             return Ok();
         }
         catch (UnauthorizedAccessException) {
