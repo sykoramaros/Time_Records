@@ -71,10 +71,8 @@ public class RecordTimeService {
         };
     }
     
-    public async Task<TimeFormatDto> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] string userId)
-    {
-        if (string.IsNullOrEmpty(userId))
-        {
+    public async Task<TimeFormatDto> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
             throw new UnauthorizedAccessException("User not found");
         }
 

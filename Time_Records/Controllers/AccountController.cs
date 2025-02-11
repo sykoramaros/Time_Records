@@ -25,29 +25,29 @@ public class AccountController : ControllerBase {
         this.configuration = configuration;
     }
 
-    [HttpGet]
-    public IActionResult Login(string returnUrl) {
-        LoginDto loginDto = new LoginDto();
-        loginDto.ReturnUrl = returnUrl;
-        return Ok(loginDto);
-    }
-
-    [HttpPost("Login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginDto) {
-        if (ModelState.IsValid) {
-            AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
-            if (appUser != null) {
-                await signInManager.SignOutAsync();
-                Microsoft.AspNetCore.Identity.SignInResult result
-                    = await signInManager.PasswordSignInAsync(appUser, loginDto.Password, false, false);
-                if (result.Succeeded) {
-                    return Ok(new { message = "Login successful", returnUrl = loginDto.ReturnUrl ?? "/" });
-                }
-            }
-        }
-
-        return Unauthorized();
-    }
+    // [HttpGet]
+    // public IActionResult Login(string returnUrl) {
+    //     LoginDto loginDto = new LoginDto();
+    //     loginDto.ReturnUrl = returnUrl;
+    //     return Ok(loginDto);
+    // }
+    //
+    // [HttpPost("Login")]
+    // public async Task<IActionResult> Login([FromBody] LoginDto loginDto) {
+    //     if (ModelState.IsValid) {
+    //         AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
+    //         if (appUser != null) {
+    //             await signInManager.SignOutAsync();
+    //             Microsoft.AspNetCore.Identity.SignInResult result
+    //                 = await signInManager.PasswordSignInAsync(appUser, loginDto.Password, false, false);
+    //             if (result.Succeeded) {
+    //                 return Ok(new { message = "Login successful", returnUrl = loginDto.ReturnUrl ?? "/" });
+    //             }
+    //         }
+    //     }
+    //
+    //     return Unauthorized();
+    // }
 
     [HttpPost("Jwt-login")]
     public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
