@@ -13,6 +13,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<RecordService>();
 builder.Services.AddScoped<RecordTimeService>();
+builder.Services.AddScoped<StudyService>();
 builder.Services.AddHttpContextAccessor();
 
 // EXTERNI ASP.NET Mariadb
@@ -49,7 +50,7 @@ builder.Services.AddSwaggerGen();
 // Nesmíš použít AllowAnyOrigin() spolu s AllowCredentials(), protože to prohlížeč nepovolí.
 builder.Services.AddCors(options => {
     options.AddPolicy("MyCorsPolicy", builder => {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("https://sykoramaros.github.io", "http://localhost:3000")
         // builder.AllowAnyOrigin()
             .AllowCredentials()
             .AllowAnyMethod()
