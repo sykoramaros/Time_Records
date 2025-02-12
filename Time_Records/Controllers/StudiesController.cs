@@ -13,6 +13,16 @@ public class StudiesController : ControllerBase {
         this.studyService = studyService;
     }
 
+    [HttpGet("GetSumActualMinistryYearRecordStudyQuery")]
+    public async Task<ActionResult<int>> GetSumActualMinistryYearRecordStudyQuery(string userId) {
+        var actualMinistryYearStudies = await studyService.SumActualMinistryYearRecordStudyQuery(userId);
+        if (actualMinistryYearStudies == null) {
+            return NotFound("No records found");
+        }
+        return actualMinistryYearStudies;
+    }
+    
+
     [HttpGet("GetSumActualMonthRecordStudyQuery")]
     public async Task<ActionResult<int>> GetSumActualMonthRecordStudyQuery(string userId) {
         var actualMonthStudies = await studyService.SumActualMonthRecordStudyQuery(userId);

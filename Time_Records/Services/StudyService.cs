@@ -11,6 +11,29 @@ public class StudyService {
         this.dbContext = dbContext;
     }
 
+    public async Task<int> SumActualMinistryYearRecordStudyQuery([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        int actualYear = (int)DateTime.Now.Year;
+        DateOnly startMinistryYear;
+        DateOnly endMinistryYear;
+        if (DateTime.Now.Month <= 8) {
+            startMinistryYear = new DateOnly(actualYear - 1, 9, 1);
+            endMinistryYear = new DateOnly(actualYear, 8, 31);
+        } else {
+            startMinistryYear = new DateOnly(actualYear, 9, 1);
+            endMinistryYear = new DateOnly(actualYear + 1, 8, 31);
+        }
+
+        var actualMinstryYearStudies = await dbContext.Records
+            .Where(record => record.IdentityUserId == userId &&
+                             record.Date >= startMinistryYear &&
+                             record.Date <= endMinistryYear)
+            .SumAsync(record => record.RecordStudy ?? 0);
+        return actualMinstryYearStudies;
+    }
+
     public async Task<int> SumActualMonthRecordStudyQuery([FromQuery] string userId) {
         if (string.IsNullOrEmpty(userId)) {
             throw new UnauthorizedAccessException("User not found");
