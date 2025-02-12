@@ -41,7 +41,15 @@ public class StudiesController : ControllerBase {
 
         return Ok(actualWeekStudies);
     }
-    
+
+    [HttpGet("GetActualMinistryYearAverageStudyQuery")]
+    public async Task<ActionResult<double>> GetActualMinistryYearAverageStudyQuery(string userId) {
+        var averageActualMinistryYearStudies = await studyService.ActualMinistryYearAverageRecordStudyQuery(userId);
+        if (averageActualMinistryYearStudies == null) {
+            return NotFound("No study found in records");
+        }
+        return averageActualMinistryYearStudies;
+    }
     
     
 }

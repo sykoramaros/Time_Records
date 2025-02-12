@@ -15,23 +15,40 @@ public class StudyService {
         if (string.IsNullOrEmpty(userId)) {
             throw new UnauthorizedAccessException("User not found");
         }
-        int actualYear = (int)DateTime.Now.Year;
-        DateOnly startMinistryYear;
-        DateOnly endMinistryYear;
-        if (DateTime.Now.Month <= 8) {
-            startMinistryYear = new DateOnly(actualYear - 1, 9, 1);
-            endMinistryYear = new DateOnly(actualYear, 8, 31);
-        } else {
-            startMinistryYear = new DateOnly(actualYear, 9, 1);
-            endMinistryYear = new DateOnly(actualYear + 1, 8, 31);
-        }
-
+        var startMinistryYear = await ActualMinistryYearStart(userId);
+        var endMinistryYear = await ActualMinistryYearEnd(userId);
         var actualMinstryYearStudies = await dbContext.Records
             .Where(record => record.IdentityUserId == userId &&
                              record.Date >= startMinistryYear &&
                              record.Date <= endMinistryYear)
             .SumAsync(record => record.RecordStudy ?? 0);
         return actualMinstryYearStudies;
+    }
+    public async Task<DateOnly> ActualMinistryYearStart([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        int actualYear = (int)DateTime.Now.Year;
+        DateOnly startMinistryYear;
+        if (DateTime.Now.Month <= 8) {
+            startMinistryYear = new DateOnly(actualYear - 1, 9, 1);
+        } else {
+            startMinistryYear = new DateOnly(actualYear, 9, 1);
+        }
+        return startMinistryYear;
+    }
+    public async Task<DateOnly> ActualMinistryYearEnd([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        int actualYear = (int)DateTime.Now.Year;
+        DateOnly endMinistryYear;
+        if (DateTime.Now.Month <= 8) {
+            endMinistryYear = new DateOnly(actualYear, 9, 1);
+        } else {
+            endMinistryYear = new DateOnly(actualYear + 1, 9, 1);
+        }
+        return endMinistryYear;
     }
 
     public async Task<int> SumActualMonthRecordStudyQuery([FromQuery] string userId) {
@@ -55,7 +72,6 @@ public class StudyService {
         if (string.IsNullOrEmpty(userId)) {
             throw new UnauthorizedAccessException("User not found");
         }
-
         int exactDay = (int)DateTime.Now.DayOfWeek;
         var actualDate = DateTime.Now;
         var startWeek = actualDate.AddDays(-(exactDay - 1));
@@ -63,13 +79,25 @@ public class StudyService {
             startWeek = actualDate.AddDays(-6);
         }
         var endWeek = startWeek.AddDays(7);
-
         int actualWeekStudies = await dbContext.Records
             .Where(record => record.Date >= DateOnly.FromDateTime(startWeek) &&
                              record.Date <= DateOnly.FromDateTime(endWeek))
             .SumAsync(record => record.RecordStudy ?? 0);
         return actualWeekStudies;
     }
-    
-    
+
+    public async Task<double> ActualMinistryYearAverageRecordStudyQuery([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        int averageDivisor;
+        if (DateTime.Now.Month <= 8) {
+            averageDivisor = DateTime.Now.Month + 4;
+        } else {
+            averageDivisor = DateTime.Now.Month - 8;
+        }
+        var actualMinistryYearStudies = await SumActualMinistryYearRecordStudyQuery(userId);
+        var averageActualMinistryYearStudies = Math.Round((double)actualMinistryYearStudies / averageDivisor, 1);
+        return averageActualMinistryYearStudies;
+    }
 }
