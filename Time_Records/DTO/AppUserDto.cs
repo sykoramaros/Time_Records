@@ -9,4 +9,6 @@ public class AppUserDto {
     public string? Password { get; set; }
     public string? PhoneNumber { get; set; }
     
+    public int? MonthTimeGoal { get; set; }
+    
 }
