@@ -14,14 +14,6 @@ public class RecordsController : ControllerBase {
         this.recordService = recordService;
     }
     
-    // [HttpGet("GetAllRecords")]
-    // public ActionResult<IEnumerable<RecordDto>> GetAllRecords() {
-    //     var records = recordService.GetAllRecords();
-    //     if (records == null || !records.Any()) {
-    //         return NotFound("No records found");
-    //     }
-    //     return Ok(records);
-    // }
     
     [HttpGet("GetAllRecords")]
     public async Task<ActionResult<IEnumerable<RecordDto>>> GetAllRecords() {
@@ -107,12 +99,6 @@ public class RecordsController : ControllerBase {
         }
     }
     
-    // zatim haze error 400
-    [HttpPut("EditRecordByDate/{date}")]
-    public async Task<ActionResult> EditRecordByDateAsync(DateOnly date, RecordDto recordDto) {
-        await recordService.EditRecordByDateAsync(date, recordDto);
-        return Ok();
-    }
     
     [HttpPut("EditRecordByDateQuery")]
     public async Task<ActionResult> EditRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date, [FromBody] RecordDto editedRecord) {
@@ -126,32 +112,6 @@ public class RecordsController : ControllerBase {
         catch (Exception ex) {
             return BadRequest(ex.Message);
         }
-    }
-    
-    [HttpPut("EditRecordById/{id}")]
-    public async Task<ActionResult> EditRecordByIdAsync(int id, RecordDto recordDto) {
-        await recordService.EditRecordByIdAsync(id, recordDto);
-        return Ok();
-    }
-    
-    [HttpDelete("DeleteRecordById/{id}")]
-    public async Task<IActionResult> DeleteRecordByIdAsync(int id) {
-        var recordToDelete = await recordService.GetRecordByIdAsync(id);
-        if (recordToDelete == null) {
-            return NotFound("Record not found");
-        }
-        await recordService.DeleteRecordByIdAsync(id);
-        return Ok();
-    }
-    
-    [HttpDelete("DeleteRecordByDate/{date}")]
-    public async Task<IActionResult> DeleteRecordByDateAsync(DateOnly date) {
-        var recordToDelete = await recordService.GetRecordByDateAsync(date);
-        if (recordToDelete == null) {
-            return NotFound("Record not found");
-        }
-        await recordService.DeleteRecordByDateAsync(date);
-        return Ok();
     }
     
     [HttpDelete("DeleteRecordByDateQuery")]
@@ -168,27 +128,68 @@ public class RecordsController : ControllerBase {
         }
     }
     
-    [HttpGet("SumDayTotalRecordTime")]
-    public async Task<ActionResult<TimeSpan>> SumDayTotalRecordTimeAsync() {
-        var sum = await recordService.SumDayTotalRecordTimeAsync();
-        return Ok(sum);
-    }
+    // [HttpGet("GetAllRecords")]
+    // public ActionResult<IEnumerable<RecordDto>> GetAllRecords() {
+    //     var records = recordService.GetAllRecords();
+    //     if (records == null || !records.Any()) {
+    //         return NotFound("No records found");
+    //     }
+    //     return Ok(records);
+    // }
+    // zatim haze error 400
+    // [HttpPut("EditRecordByDate/{date}")]
+    // public async Task<ActionResult> EditRecordByDateAsync(DateOnly date, RecordDto recordDto) {
+    //     await recordService.EditRecordByDateAsync(date, recordDto);
+    //     return Ok();
+    // }
+    // [HttpPut("EditRecordById/{id}")]
+    // public async Task<ActionResult> EditRecordByIdAsync(int id, RecordDto recordDto) {
+    //     await recordService.EditRecordByIdAsync(id, recordDto);
+    //     return Ok();
+    // }
     
-    [HttpGet("SumHoursTotalRecordTimeInHoursAsStringAsync")]
-    public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsStringAsync() {
-        var sum = await recordService.SumHoursTotalRecordTimeInHoursAsStringAsync();
-        return Ok(sum);
-    }
+    // [HttpDelete("DeleteRecordById/{id}")]
+    // public async Task<IActionResult> DeleteRecordByIdAsync(int id) {
+    //     var recordToDelete = await recordService.GetRecordByIdAsync(id);
+    //     if (recordToDelete == null) {
+    //         return NotFound("Record not found");
+    //     }
+    //     await recordService.DeleteRecordByIdAsync(id);
+    //     return Ok();
+    // }
     
-    [HttpGet("SumHoursTotalRecordTimeInHoursAsIntAsync")]
-    public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsIntAsync() {
-        var sum = await recordService.SumHoursTotalRecordTimeInHoursAsIntAsync();
-        return Ok(sum);
-    }
+    // [HttpDelete("DeleteRecordByDate/{date}")]
+    // public async Task<IActionResult> DeleteRecordByDateAsync(DateOnly date) {
+    //     var recordToDelete = await recordService.GetRecordByDateAsync(date);
+    //     if (recordToDelete == null) {
+    //         return NotFound("Record not found");
+    //     }
+    //     await recordService.DeleteRecordByDateAsync(date);
+    //     return Ok();
+    // }
     
-    [HttpGet("SumHoursTotalRecordTimeInHoursAsDoubleAsync")]
-    public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsDoubleAsync() {
-        var sum = await recordService.SumHoursTotalRecordTimeInHoursAsDoubleAsync();
-        return Ok(sum);
-    }
+    
+    // [HttpGet("SumDayTotalRecordTime")]
+    // public async Task<ActionResult<TimeSpan>> SumDayTotalRecordTimeAsync() {
+    //     var sum = await recordService.SumDayTotalRecordTimeAsync();
+    //     return Ok(sum);
+    // }
+    
+    // [HttpGet("SumHoursTotalRecordTimeInHoursAsStringAsync")]
+    // public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsStringAsync() {
+    //     var sum = await recordService.SumHoursTotalRecordTimeInHoursAsStringAsync();
+    //     return Ok(sum);
+    // }
+    
+    // [HttpGet("SumHoursTotalRecordTimeInHoursAsIntAsync")]
+    // public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsIntAsync() {
+    //     var sum = await recordService.SumHoursTotalRecordTimeInHoursAsIntAsync();
+    //     return Ok(sum);
+    // }
+    //
+    // [HttpGet("SumHoursTotalRecordTimeInHoursAsDoubleAsync")]
+    // public async Task<ActionResult<double>> SumHoursTotalRecordTimeInHoursAsDoubleAsync() {
+    //     var sum = await recordService.SumHoursTotalRecordTimeInHoursAsDoubleAsync();
+    //     return Ok(sum);
+    // }
 }
