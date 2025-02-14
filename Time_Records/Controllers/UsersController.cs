@@ -53,11 +53,12 @@ public class UsersController : ControllerBase {
             AppUser appUser = new AppUser {
                 UserName = newUser.Name,
                 Email = newUser.Email,
-                PhoneNumber = newUser.PhoneNumber
+                PhoneNumber = newUser.PhoneNumber,
+                MonthTimeGoal = newUser.MonthTimeGoal
             };
             IdentityResult result = await userManager.CreateAsync(appUser, newUser.Password);
             if (result.Succeeded) {
-                return Ok(new {success = true, user = new {appUser.Id, appUser.UserName, appUser.Email, appUser.PhoneNumber}});
+                return Ok(new {success = true, user = new {appUser.Id, appUser.UserName, appUser.Email, appUser.PhoneNumber, appUser.MonthTimeGoal}});
             }
             return BadRequest(result.Errors);
         } else {
@@ -74,6 +75,7 @@ public class UsersController : ControllerBase {
         userToEdit.UserName = editedUser.Name;
         userToEdit.Email = editedUser.Email;
         userToEdit.PhoneNumber = editedUser.PhoneNumber;
+        userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
         IdentityResult result = await userManager.UpdateAsync(userToEdit);
         if (result.Succeeded) {
             return Ok();
@@ -95,4 +97,7 @@ public class UsersController : ControllerBase {
             return BadRequest(result.Errors);
         }
     }
+    
+    
+    
 }

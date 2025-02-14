@@ -27,14 +27,12 @@ public class RecordTimeService {
         var actualYear = DateTime.Now.Year;
         var startMinistryYear = new DateOnly(actualYear - 1, 9, 1);
         var endMinistryYear = new DateOnly(actualYear, 8, 31);
-    
         var actualYearRecords = await dbContext.Records
             .Where(record =>
                 record.IdentityUserId == userId &&
                 record.Date >= startMinistryYear &&
                 record.Date <= endMinistryYear)
             .ToListAsync();
-    
         var totalTime = actualYearRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
         return new TimeFormatDto() 
         { 
@@ -45,8 +43,9 @@ public class RecordTimeService {
     
     public async Task<double> YearRecordProgressQueryAsync([FromQuery] string userId) {
         var yearTotalRecord = await SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
         var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
-        var yearHoursQuote = 600.0;
+        var yearHoursQuote = monthTimeGoal * 12.0;
         var percentageYearProgress = (hoursAndMinutes * 100) / yearHoursQuote;
         return Math.Round(percentageYearProgress);
     }
@@ -55,9 +54,9 @@ public class RecordTimeService {
         if (string.IsNullOrEmpty(userId)) {
             throw new UnauthorizedAccessException("User not found");
         }
-
-        var yearHoursQuote = 600.0;
         var yearTotalRecord = await SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var yearHoursQuote = monthTimeGoal * 12.0;
         var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
         var remainingTime = yearHoursQuote - hoursAndMinutes;
 
@@ -96,8 +95,9 @@ public class RecordTimeService {
             throw new UnauthorizedAccessException("User not found");
         }
         var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
         var hoursAndMinutes = monthTotalRecord.Hours + (monthTotalRecord.Minutes / 60.0);
-        var percentageMonthProgress = (hoursAndMinutes * 100.0) / 50;
+        var percentageMonthProgress = (hoursAndMinutes * 100.0) / monthTimeGoal;
         return Math.Round(percentageMonthProgress);
     }
     
@@ -106,10 +106,10 @@ public class RecordTimeService {
         {
             throw new UnauthorizedAccessException("User not found");
         }
-        var monthHoursQuote = 50.0;
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
         var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
         var hoursAndMinutes = monthTotalRecord.Hours + (monthTotalRecord.Minutes / 60.0);
-        var remainingTime = monthHoursQuote - hoursAndMinutes;
+        var remainingTime = monthTimeGoal - hoursAndMinutes;
         return new TimeFormatDto()
         { 
             Hours = (int)remainingTime,
@@ -151,9 +151,11 @@ public class RecordTimeService {
         if (string.IsNullOrEmpty(userId)) {
             throw new UnauthorizedAccessException("User not found");
         }
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var weekTimeQuote = monthTimeGoal / 4; 
         var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
         var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
-        var percentageWeekProgress = (hoursAndMinutes * 100.0) / 12.5;
+        var percentageWeekProgress = (hoursAndMinutes * 100.0) / weekTimeQuote;
         return Math.Round(percentageWeekProgress);
     }
     
@@ -162,15 +164,27 @@ public class RecordTimeService {
         {
             throw new UnauthorizedAccessException("User not found");
         }
-        var weekHoursQuote = 12.5;
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var weekTimeQuote = monthTimeGoal / 4; 
         var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
         var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
-        var remainingTime = weekHoursQuote - hoursAndMinutes;
+        var remainingTime = weekTimeQuote - hoursAndMinutes;
         return new TimeFormatDto()
         { 
             Hours = (int)remainingTime,
             Minutes = (int)((remainingTime - (int)remainingTime) * 60)
         };
+    }
+
+    public async Task<int> GetMonthTimeGoalAsyncQuery([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var monthTimeGoal = await userManager.Users
+            .Where(user => user.Id == userId)
+            .Select(user => user.MonthTimeGoal)
+            .FirstOrDefaultAsync() ?? 0;
+        return monthTimeGoal;
     }
     
     // public async Task<TimeFormatDto> SumTotalRecordTimeAsync() {

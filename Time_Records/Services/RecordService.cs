@@ -52,18 +52,6 @@ public class RecordService {
             IdentityUserId = recordDto.IdentityUserId
         };
     }
-
-
-    public async Task CreateRecordAsync(RecordDto recordDto) {
-        var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
-        if (user == null) {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var record = DtoToModel(recordDto);
-        record.IdentityUserId = user.Id;
-        await dbContext.Records.AddAsync(record);
-        await dbContext.SaveChangesAsync();
-    }
     
     public async Task CreateRecordQueryAsync([FromQuery] string userId, RecordDto recordDto) {
         if (string.IsNullOrEmpty(userId)) {
@@ -74,7 +62,6 @@ public class RecordService {
         await dbContext.Records.AddAsync(record);
         await dbContext.SaveChangesAsync();
     }
-    
     
     internal async Task<IEnumerable<RecordDto>> GetAllRecords() {
         // var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
@@ -89,42 +76,14 @@ public class RecordService {
             .AsEnumerable();
     }
     
-    internal async Task<IEnumerable<RecordDto>> GetAllRecordsQuery([FromQuery] string userId)
-    {
-        if (string.IsNullOrEmpty(userId))
-        {
+    internal async Task<IEnumerable<RecordDto>> GetAllRecordsQuery([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
             throw new UnauthorizedAccessException("User not found");
         }
-
         return dbContext.Records
             .Where(r => r.IdentityUserId == userId)
             .Select(ModelToDto)
             .AsEnumerable();
-    }
-    
-    internal async Task<RecordDto> GetRecordByIdAsync(int id) {
-        var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
-        if (user == null) {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var recordToEdit = await dbContext.Records
-            .FirstOrDefaultAsync(r => r.Id == id && r.IdentityUserId == user.Id);
-        if (recordToEdit == null) {
-            return null;
-        }
-        return ModelToDto(recordToEdit);
-    }
-    internal async Task<RecordDto> GetRecordByDateAsync(DateOnly date) {
-        var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
-        if (user == null) {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var recordToEdit = await dbContext.Records
-            .FirstOrDefaultAsync(r => r.Date == date && r.IdentityUserId == user.Id);
-        if (recordToEdit == null) {
-            return null;
-        }
-        return ModelToDto(recordToEdit);
     }
     
     internal async Task<RecordDto> GetRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
@@ -169,6 +128,40 @@ public class RecordService {
 }
 
     
+    // public async Task CreateRecordAsync(RecordDto recordDto) {
+    //     var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+    //     if (user == null) {
+    //         throw new UnauthorizedAccessException("User not found");
+    //     }
+    //     var record = DtoToModel(recordDto);
+    //     record.IdentityUserId = user.Id;
+    //     await dbContext.Records.AddAsync(record);
+    //     await dbContext.SaveChangesAsync();
+    // }
+    // internal async Task<RecordDto> GetRecordByIdAsync(int id) {
+    //     var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+    //     if (user == null) {
+    //         throw new UnauthorizedAccessException("User not found");
+    //     }
+    //     var recordToEdit = await dbContext.Records
+    //         .FirstOrDefaultAsync(r => r.Id == id && r.IdentityUserId == user.Id);
+    //     if (recordToEdit == null) {
+    //         return null;
+    //     }
+    //     return ModelToDto(recordToEdit);
+    // }
+    // internal async Task<RecordDto> GetRecordByDateAsync(DateOnly date) {
+    //     var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+    //     if (user == null) {
+    //         throw new UnauthorizedAccessException("User not found");
+    //     }
+    //     var recordToEdit = await dbContext.Records
+    //         .FirstOrDefaultAsync(r => r.Date == date && r.IdentityUserId == user.Id);
+    //     if (recordToEdit == null) {
+    //         return null;
+    //     }
+    //     return ModelToDto(recordToEdit);
+    // }
     // public async Task CreateRecordAsync(RecordDto recordDto) {
     //     await dbContext.Records.AddAsync(DtoToModel(recordDto));
     //     await dbContext.SaveChangesAsync();

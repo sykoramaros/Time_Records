@@ -35,23 +35,6 @@ public class RecordsController : ControllerBase {
         return Ok(records);
     }
     
-    [HttpGet("GetRecordById/{id}")]
-    public async Task<ActionResult<RecordDto>> GetRecordByIdAsync(int id) {
-        var record = await recordService.GetRecordByIdAsync(id);
-        if (record == null) {
-            return NotFound("Record not found");
-        }
-        return Ok(record);
-    }
-    
-    [HttpGet("GetRecordByDate/{date}")]
-    public async Task<ActionResult<RecordDto>> GetRecordByDateAsync(DateOnly date) {
-        var record = await recordService.GetRecordByDateAsync(date);
-        if (record == null) {
-            return NotFound("Record not found");
-        }
-        return Ok(record);
-    }
     
     [HttpGet("GetRecordByDateQuery")]
     public async Task<ActionResult<RecordDto>> GetRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
@@ -71,19 +54,6 @@ public class RecordsController : ControllerBase {
     //     "description": "zkouska swagger s pocatecni nulou"
     // }
     
-    [HttpPost("CreateRecord")]
-    public async Task<ActionResult> CreateRecordAsync([FromBody] RecordDto recordDto) {
-        if (!ModelState.IsValid) {
-            return BadRequest(ModelState);
-        }
-        try {
-            await recordService.CreateRecordAsync(recordDto);
-            return Ok();
-        }
-        catch (Exception exception) {
-            return StatusCode(500, "An error occurred while creating the record: " + exception.Message);
-        }
-    }
     
     [HttpPost("CreateRecordQuery")]
     public async Task<ActionResult> CreateRecordQueryAsync([FromQuery] string userId, [FromBody] RecordDto recordDto) {
@@ -128,6 +98,36 @@ public class RecordsController : ControllerBase {
         }
     }
     
+    // [HttpPost("CreateRecord")]
+    // public async Task<ActionResult> CreateRecordAsync([FromBody] RecordDto recordDto) {
+    //     if (!ModelState.IsValid) {
+    //         return BadRequest(ModelState);
+    //     }
+    //     try {
+    //         await recordService.CreateRecordAsync(recordDto);
+    //         return Ok();
+    //     }
+    //     catch (Exception exception) {
+    //         return StatusCode(500, "An error occurred while creating the record: " + exception.Message);
+    //     }
+    // }
+    // [HttpGet("GetRecordById/{id}")]
+    // public async Task<ActionResult<RecordDto>> GetRecordByIdAsync(int id) {
+    //     var record = await recordService.GetRecordByIdAsync(id);
+    //     if (record == null) {
+    //         return NotFound("Record not found");
+    //     }
+    //     return Ok(record);
+    // }
+    //
+    // [HttpGet("GetRecordByDate/{date}")]
+    // public async Task<ActionResult<RecordDto>> GetRecordByDateAsync(DateOnly date) {
+    //     var record = await recordService.GetRecordByDateAsync(date);
+    //     if (record == null) {
+    //         return NotFound("Record not found");
+    //     }
+    //     return Ok(record);
+    // }
     // [HttpGet("GetAllRecords")]
     // public ActionResult<IEnumerable<RecordDto>> GetAllRecords() {
     //     var records = recordService.GetAllRecords();
