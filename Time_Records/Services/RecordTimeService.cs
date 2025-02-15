@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ public class RecordTimeService {
         var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
         var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
         var yearHoursQuote = monthTimeGoal * 12.0;
-        var percentageYearProgress = (hoursAndMinutes * 100) / yearHoursQuote;
+        var percentageYearProgress = (hoursAndMinutes * 100.0) / yearHoursQuote;
         return Math.Round(percentageYearProgress);
     }
     
@@ -152,7 +153,7 @@ public class RecordTimeService {
             throw new UnauthorizedAccessException("User not found");
         }
         var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var weekTimeQuote = monthTimeGoal / 4; 
+        var weekTimeQuote = monthTimeGoal / 4.0; 
         var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
         var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
         var percentageWeekProgress = (hoursAndMinutes * 100.0) / weekTimeQuote;
@@ -165,7 +166,7 @@ public class RecordTimeService {
             throw new UnauthorizedAccessException("User not found");
         }
         var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var weekTimeQuote = monthTimeGoal / 4; 
+        var weekTimeQuote = monthTimeGoal / 4.0; 
         var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
         var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
         var remainingTime = weekTimeQuote - hoursAndMinutes;
@@ -184,6 +185,9 @@ public class RecordTimeService {
             .Where(user => user.Id == userId)
             .Select(user => user.MonthTimeGoal)
             .FirstOrDefaultAsync() ?? 0;
+        // if (monthTimeGoal == 0) {
+        //     throw new InvalidOperationException("Month time goal cannot be zero");
+        // }
         return monthTimeGoal;
     }
     

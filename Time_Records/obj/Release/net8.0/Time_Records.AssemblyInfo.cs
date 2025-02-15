@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Time_Records")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+20eec1df66502db05bd3b686c5acecdf23cc4f8a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a870b6c21770fb0b25b8bb0e91377e1c77e2207a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Time_Records")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Time_Records")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

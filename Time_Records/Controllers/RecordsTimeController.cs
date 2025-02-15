@@ -25,6 +25,10 @@ public class RecordsTimeController : ControllerBase {
     [HttpGet("YearRecordProgressQuery")]
     public async Task<ActionResult<double>> YearRecordProgressQueryAsync([FromQuery] string userId) {
         var yearPercentageProgress = await recordTimeService.YearRecordProgressQueryAsync(userId);
+        if (double.IsInfinity(yearPercentageProgress)) {
+            return BadRequest("The result is Infinity, which is not valid.");
+        }
+
         return Ok(yearPercentageProgress);
     }
     [HttpGet("YearRemainingTimeQuery")]
@@ -43,6 +47,10 @@ public class RecordsTimeController : ControllerBase {
     [HttpGet("MonthRecordProgressQuery")]
     public async Task<ActionResult<double>> MonthRecordProgressQueryAsync([FromQuery] string userId) {
         var monthPercentageProgress = await recordTimeService.MonthRecordProgressQueryAsync(userId);
+        if (double.IsInfinity(monthPercentageProgress)) {
+            return BadRequest("The result is Infinity, which is not valid.");
+        }
+
         return Ok(monthPercentageProgress);
     }
     [HttpGet("MonthRemainingTimeQuery")]
@@ -62,12 +70,24 @@ public class RecordsTimeController : ControllerBase {
     [HttpGet("WeekRecordProgressQuery")]
     public async Task<ActionResult<double>> WeekRecordProgressQueryAsync([FromQuery] string userId) {
         var weekPercentageProgress = await recordTimeService.WeekRecordProgressQueryAsync(userId);
+        if (double.IsInfinity(weekPercentageProgress)) {
+            return BadRequest("The result is Infinity, which is not valid.");
+        }
         return Ok(weekPercentageProgress);
     }
     [HttpGet("WeekRemainingTimeQuery")]
     public async Task<ActionResult<TimeFormatDto>> WeekRemainingTimeQueryAsync([FromQuery] string userId) {
         var remainingTime = await recordTimeService.WeekRemainingTimeQueryAsync(userId);
         return Ok(remainingTime);
+    }
+    
+    [HttpGet("GetMonthTimeGoalQuery")]
+    public async Task<ActionResult<int>> GetMonthTimeGoalQueryAsync([FromQuery] string userId) {
+        var monthTimeGoal = await recordTimeService.GetMonthTimeGoalAsyncQuery(userId);
+        if (monthTimeGoal == null) {
+            return BadRequest("Month time goal cannot be zero");
+        }
+        return Ok(monthTimeGoal);
     }
 
     // [HttpGet("SumTotalRecordTime")]
