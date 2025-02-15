@@ -54,7 +54,7 @@ public class UsersController : ControllerBase {
                 UserName = newUser.Name,
                 Email = newUser.Email,
                 PhoneNumber = newUser.PhoneNumber,
-                MonthTimeGoal = newUser.MonthTimeGoal
+                MonthTimeGoal = (newUser.MonthTimeGoal == null || newUser.MonthTimeGoal == 0) ? 15 : newUser.MonthTimeGoal
             };
             IdentityResult result = await userManager.CreateAsync(appUser, newUser.Password);
             if (result.Succeeded) {
@@ -75,7 +75,7 @@ public class UsersController : ControllerBase {
         userToEdit.UserName = editedUser.Name;
         userToEdit.Email = editedUser.Email;
         userToEdit.PhoneNumber = editedUser.PhoneNumber;
-        userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+        userToEdit.MonthTimeGoal = (editedUser.MonthTimeGoal == null || editedUser.MonthTimeGoal == 0) ? 15 : editedUser.MonthTimeGoal;
         IdentityResult result = await userManager.UpdateAsync(userToEdit);
         if (result.Succeeded) {
             return Ok();
