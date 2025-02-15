@@ -97,7 +97,20 @@ public class UsersController : ControllerBase {
             return BadRequest(result.Errors);
         }
     }
-    
-    
-    
+
+    [HttpPut("EditMonthTimeGoal")]
+    public async Task<IActionResult> EditMonthTimeGoalAsyncQuery([FromQuery] string userId, [FromBody] AppUserDto editedUser) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var monthTimeGoalToEdit = await userManager.Users
+            .FirstOrDefaultAsync(record => record.Id == userId);
+        monthTimeGoalToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+        IdentityResult result = await userManager.UpdateAsync(monthTimeGoalToEdit);
+        if (result.Succeeded) {
+            return Ok();
+        } else {
+            return BadRequest(result.Errors);
+        }
+    }
 }
