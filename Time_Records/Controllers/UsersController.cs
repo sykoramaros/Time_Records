@@ -83,6 +83,29 @@ public class UsersController : ControllerBase {
             return BadRequest(result.Errors);
         }
     }
+
+    [HttpPut("EditUserByIdQuery")]
+    public async Task<IActionResult> EditUsrByIdQueryAsync([FromQuery] string userId, [FromBody] AppUserDto editedUser) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("No user is found");
+        }
+        var userToEdit = await userManager.Users
+            .Where(user => user.Id == userId)
+            .FirstOrDefaultAsync();
+        if (userToEdit == null) {
+            return NotFound("User ID was not found");
+        }
+        userToEdit.UserName = editedUser.Name;
+        userToEdit.Email = editedUser.Email;
+        userToEdit.PhoneNumber = editedUser.PhoneNumber;
+        userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+        IdentityResult result = await userManager.UpdateAsync(userToEdit);
+        if (result.Succeeded) {
+            return Ok();
+        } else {
+            return BadRequest(result.Errors);
+        }
+    }
     
     [HttpDelete("DeleteUser/{id}")]
     public async Task<IActionResult> DeleteUser(string id) {
