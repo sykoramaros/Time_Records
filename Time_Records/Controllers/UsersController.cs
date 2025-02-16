@@ -33,6 +33,20 @@ public class UsersController : ControllerBase {
         }
         return Ok(user);
     }
+
+    [HttpGet("GetUserByIdQuery")]
+    public async Task<IActionResult> GetUserByIdQueryAsync([FromQuery] string userId) {
+        if (string.IsNullOrEmpty(userId)) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var user = await userManager.Users
+            .Where (us => us.Id == userId)
+            .FirstOrDefaultAsync();
+        if (user == null) {
+            return NotFound("User ID was not found");
+        }
+        return Ok(user);
+    }
     
     [HttpGet("GetByUserEmail/{email}")]
     public async Task<IActionResult> GetUserByEmail(string email) {

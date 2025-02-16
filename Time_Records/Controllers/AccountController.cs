@@ -12,10 +12,11 @@ namespace Time_Records.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class AccountController : ControllerBase {
-    private UserManager<AppUser> userManager;
-    private RoleManager<IdentityRole> roleManager;
+    private  UserManager<AppUser> userManager;
+    private RoleManager<IdentityRole>? roleManager;
     private SignInManager<AppUser> signInManager;
     private IConfiguration configuration;
+
 
 
     public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
