@@ -80,6 +80,7 @@ public class UsersController : ControllerBase {
         }
     }
     
+    
     [HttpPut("EditUser/{id}")]
     public async Task<IActionResult> EditUser(string id, [FromBody] AppUserDto editedUser) {
         var userToEdit = await userManager.FindByIdAsync(id);

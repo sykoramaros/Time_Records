@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "o4XmaMz3z2o=",
+  "dgSpecHash": "0y+SsfW/wNU=",
   "success": true,
-  "projectFilePath": "/Users/marosh/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/Time_Records.csproj",
+  "projectFilePath": "/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/Time_Records.csproj",
   "expectedPackageFiles": [
     "/Users/marosh/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
+    "/Users/marosh/.nuget/packages/microsoft.aspnetcore.authentication.google/8.0.13/microsoft.aspnetcore.authentication.google.8.0.13.nupkg.sha512",
     "/Users/marosh/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.12/microsoft.aspnetcore.authentication.jwtbearer.8.0.12.nupkg.sha512",
     "/Users/marosh/.nuget/packages/microsoft.aspnetcore.authorization/8.0.12/microsoft.aspnetcore.authorization.8.0.12.nupkg.sha512",
     "/Users/marosh/.nuget/packages/microsoft.aspnetcore.components/8.0.12/microsoft.aspnetcore.components.8.0.12.nupkg.sha512",

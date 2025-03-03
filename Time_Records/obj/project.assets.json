@@ -15,6 +15,22 @@
           }
         }
       },
+      "Microsoft.AspNetCore.Authentication.Google/8.0.13": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.12": {
         "type": "package",
         "dependencies": {
@@ -2716,6 +2732,21 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "Microsoft.AspNetCore.Authentication.Google/8.0.13": {
+      "sha512": "pHL4Q83J6vzE8zz6+fkEwxVW7sXKFeFGiuJysD/Cbvos8CxNZgh/tkKyA6l5J67SQw4TVh+w20OVXcoN+RnaAw==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.authentication.google/8.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net8.0/Microsoft.AspNetCore.Authentication.Google.dll",
+        "lib/net8.0/Microsoft.AspNetCore.Authentication.Google.xml",
+        "microsoft.aspnetcore.authentication.google.8.0.13.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.google.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.12": {
@@ -8184,6 +8215,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Microsoft.AspNetCore.Authentication.Google >= 8.0.13",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.12",
       "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter >= 8.0.12",
       "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore >= 8.0.12",
@@ -8209,11 +8241,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/marosh/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/Time_Records.csproj",
+      "projectUniqueName": "/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/Time_Records.csproj",
       "projectName": "Time_Records",
-      "projectPath": "/Users/marosh/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/Time_Records.csproj",
+      "projectPath": "/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/Time_Records.csproj",
       "packagesPath": "/Users/marosh/.nuget/packages/",
-      "outputPath": "/Users/marosh/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/",
+      "outputPath": "/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/marosh/.nuget/NuGet/NuGet.Config"
@@ -8246,6 +8278,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Microsoft.AspNetCore.Authentication.Google": {
+            "target": "Package",
+            "version": "[8.0.13, )"
+          },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",
             "version": "[8.0.12, )"
