@@ -53,50 +53,96 @@ public class AccountController : ControllerBase {
     //     return Unauthorized();
     // }
 
+    // [HttpPost("Jwt-login")]
+    // public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
+    //     if (ModelState.IsValid) {
+    //         AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
+    //         if (appUser != null) {
+    //             var signInResult = await signInManager.PasswordSignInAsync(
+    //                 appUser,
+    //                 loginDto.Password,
+    //                 isPersistent: false,
+    //                 lockoutOnFailure: false
+    //                 );
+    //             if (signInResult.Succeeded) {
+    //                 var claims = new List<Claim> {
+    //                     new Claim(ClaimTypes.Name, appUser.UserName),
+    //                     new Claim(ClaimTypes.NameIdentifier, appUser.Id),
+    //                     new Claim(ClaimTypes.Email, appUser.Email),
+    //                     new Claim(ClaimTypes.MobilePhone, appUser.PhoneNumber ?? "")
+    //                 };
+    //                 var userRoles = await userManager.GetRolesAsync(appUser);
+    //                 foreach (var role in userRoles) {
+    //                     claims.Add(new Claim(ClaimTypes.Role, role));
+    //                 }
+    //                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT:SecretKey not found")));
+    //                 var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+    //                 var token = new JwtSecurityToken(
+    //                     issuer: configuration["Jwt:Issuer"],
+    //                     audience: configuration["Jwt:Audience"],
+    //                     claims: claims,
+    //                     expires: DateTime.Now.AddMinutes(10),
+    //                     signingCredentials: credentials
+    //                     );
+    //                 var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+    //                 return Ok(new {
+    //                     token = tokenString,
+    //                     message = "JWT Login successful",
+    //                     returnUrl = loginDto.ReturnUrl ?? "/"
+    //                 });
+    //             }
+    //             return Unauthorized(new { message = "Invalid credentials" });
+    //         }
+    //         return Unauthorized(new { message = "User not found" });
+    //     }
+    //     return BadRequest(new { message = "Invalid model state", errors = ModelState });
+    // }
+    
     [HttpPost("Jwt-login")]
-    public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
-        if (ModelState.IsValid) {
-            AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
-            if (appUser != null) {
-                var signInResult = await signInManager.PasswordSignInAsync(
-                    appUser,
-                    loginDto.Password,
-                    isPersistent: false,
-                    lockoutOnFailure: false
-                    );
-                if (signInResult.Succeeded) {
-                    var claims = new List<Claim> {
-                        new Claim(ClaimTypes.Name, appUser.UserName),
-                        new Claim(ClaimTypes.NameIdentifier, appUser.Id),
-                        new Claim(ClaimTypes.Email, appUser.Email),
-                        new Claim(ClaimTypes.MobilePhone, appUser.PhoneNumber ?? "")
-                    };
-                    var userRoles = await userManager.GetRolesAsync(appUser);
-                    foreach (var role in userRoles) {
-                        claims.Add(new Claim(ClaimTypes.Role, role));
-                    }
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT:SecretKey not found")));
-                    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                    var token = new JwtSecurityToken(
-                        issuer: configuration["Jwt:Issuer"],
-                        audience: configuration["Jwt:Audience"],
-                        claims: claims,
-                        expires: DateTime.Now.AddMinutes(10),
-                        signingCredentials: credentials
-                        );
-                    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-                    return Ok(new {
-                        token = tokenString,
-                        message = "JWT Login successful",
-                        returnUrl = loginDto.ReturnUrl ?? "/"
-                    });
+public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
+    if (ModelState.IsValid) {
+        AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
+        if (appUser != null) {
+            var signInResult = await signInManager.PasswordSignInAsync(
+                appUser,
+                loginDto.Password,
+                isPersistent: false,
+                lockoutOnFailure: false
+            );
+            if (signInResult.Succeeded) {
+                var claims = new List<Claim> {
+                    new Claim(ClaimTypes.Name, appUser.UserName),
+                    new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()), // Převod Guid na string
+                    new Claim(ClaimTypes.Email, appUser.Email),
+                    new Claim(ClaimTypes.MobilePhone, appUser.PhoneNumber ?? "")
+                };
+                var userRoles = await userManager.GetRolesAsync(appUser);
+                foreach (var role in userRoles) {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
                 }
-                return Unauthorized(new { message = "Invalid credentials" });
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT:SecretKey not found")));
+                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var token = new JwtSecurityToken(
+                    issuer: configuration["Jwt:Issuer"],
+                    audience: configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTime.Now.AddMinutes(10),
+                    signingCredentials: credentials
+                );
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+                return Ok(new {
+                    token = tokenString,
+                    message = "JWT Login successful",
+                    returnUrl = loginDto.ReturnUrl ?? "/"
+                });
             }
-            return Unauthorized(new { message = "User not found" });
+            return Unauthorized(new { message = "Invalid credentials" });
         }
-        return BadRequest(new { message = "Invalid model state", errors = ModelState });
+        return Unauthorized(new { message = "User not found" });
     }
+    return BadRequest(new { message = "Invalid model state", errors = ModelState });
+}
+
     
     // [HttpGet("Google-login")]
     // public IActionResult GoogleLogin() 
@@ -159,7 +205,7 @@ public class AccountController : ControllerBase {
     //     }
     //     var claims = authenticationResult.Principal.Identities.FirstOrDefault()?.Claims;
     //     var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-    //     var userName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+    //     var userName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.UserName)?.Value;
     //     var user = await userManager.FindByEmailAsync(email);
     //     if (user == null) {
     //         user = new AppUser { UserName = userName, Email = email };

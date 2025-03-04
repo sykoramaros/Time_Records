@@ -9,5 +9,5 @@ public class RecordDto {
     public TimeSpan RecordTime { get; set; }
     public int? RecordStudy { get; set; }
     public string? Description { get; set; }
-    public string? IdentityUserId { get; set; }
+    public Guid? IdentityUserId { get; set; }
 }

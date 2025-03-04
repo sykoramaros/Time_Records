@@ -22,12 +22,12 @@ public class UsersController : ControllerBase {
         this.passwordValidator = passwordValidator;
     }
 
-    public UsersController(UserManager<AppUser> userManager, IPasswordHasher<AppUser> passwordHasher, IPasswordValidator<AppUser> passwordValidator, IConfiguration configuration) {
-        this.userManager = userManager;
-        this.passwordHasher = passwordHasher;
-        this.passwordValidator = passwordValidator;
-        this.configuration = configuration;
-    }
+    // public UsersController(UserManager<AppUser> userManager, IPasswordHasher<AppUser> passwordHasher, IPasswordValidator<AppUser> passwordValidator, IConfiguration configuration) {
+    //     this.userManager = userManager;
+    //     this.passwordHasher = passwordHasher;
+    //     this.passwordValidator = passwordValidator;
+    //     this.configuration = configuration;
+    // }
 
     [HttpGet("GetAllUsers")]
     public async Task<IActionResult> GetAllUsers() {
@@ -44,19 +44,34 @@ public class UsersController : ControllerBase {
         return Ok(user);
     }
 
+    // [HttpGet("GetUserByIdQuery")]
+    // public async Task<IActionResult> GetUserByIdQueryAsync([FromQuery] string userId) {
+    //     if (string.IsNullOrEmpty(userId)) {
+    //         throw new UnauthorizedAccessException("User not found");
+    //     }
+    //     var user = await userManager.Users
+    //         .Where (us => us.Id == userId)
+    //         .FirstOrDefaultAsync();
+    //     if (user == null) {
+    //         return NotFound("User ID was not found");
+    //     }
+    //     return Ok(user);
+    // }
+    
     [HttpGet("GetUserByIdQuery")]
-    public async Task<IActionResult> GetUserByIdQueryAsync([FromQuery] string userId) {
-        if (string.IsNullOrEmpty(userId)) {
+    public async Task<IActionResult> GetUserByIdQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
         var user = await userManager.Users
-            .Where (us => us.Id == userId)
+            .Where(us => us.Id == userId)
             .FirstOrDefaultAsync();
         if (user == null) {
             return NotFound("User ID was not found");
         }
         return Ok(user);
     }
+
     
     [HttpGet("GetByUserEmail/{email}")]
     public async Task<IActionResult> GetUserByEmail(string email) {
@@ -75,7 +90,7 @@ public class UsersController : ControllerBase {
                 return BadRequest("User with this email already exists");
             }
             AppUser appUser = new AppUser {
-                UserName = newUser.Name,
+                UserName = newUser.UserName,
                 Email = newUser.Email,
                 PhoneNumber = newUser.PhoneNumber,
                 MonthTimeGoal = (newUser.MonthTimeGoal == null || newUser.MonthTimeGoal == 0) ? 15 : newUser.MonthTimeGoal
@@ -106,7 +121,7 @@ public class UsersController : ControllerBase {
                 }
                 // Vytvoření nového uživatele
                 AppUser appUser = new AppUser {
-                    UserName = newUser.Name,
+                    UserName = newUser.UserName,
                     Email = newUser.Email,
                     PhoneNumber = newUser.PhoneNumber,
                     MonthTimeGoal = newUser.MonthTimeGoal ?? 15 // Defaultní hodnota pro MonthTimeGoal
@@ -149,13 +164,31 @@ public class UsersController : ControllerBase {
         }
     }
     
+    // [HttpPut("EditUser/{id}")]
+    // public async Task<IActionResult> EditUser(string id, [FromBody] AppUserDto editedUser) {
+    //     var userToEdit = await userManager.FindByIdAsync(id);
+    //     if (userToEdit == null) {
+    //         return NotFound("User not found");
+    //     }
+    //     userToEdit.UserName = editedUser.UserName;
+    //     userToEdit.Email = editedUser.Email;
+    //     userToEdit.PhoneNumber = editedUser.PhoneNumber;
+    //     userToEdit.MonthTimeGoal = (editedUser.MonthTimeGoal == null || editedUser.MonthTimeGoal == 0) ? 15 : editedUser.MonthTimeGoal;
+    //     IdentityResult result = await userManager.UpdateAsync(userToEdit);
+    //     if (result.Succeeded) {
+    //         return Ok();
+    //     } else {
+    //         return BadRequest(result.Errors);
+    //     }
+    // }
+    
     [HttpPut("EditUser/{id}")]
-    public async Task<IActionResult> EditUser(string id, [FromBody] AppUserDto editedUser) {
-        var userToEdit = await userManager.FindByIdAsync(id);
+    public async Task<IActionResult> EditUser(Guid id, [FromBody] AppUserDto editedUser) {
+        var userToEdit = await userManager.FindByIdAsync(id.ToString());  // Převedení Guid na string
         if (userToEdit == null) {
             return NotFound("User not found");
         }
-        userToEdit.UserName = editedUser.Name;
+        userToEdit.UserName = editedUser.UserName;
         userToEdit.Email = editedUser.Email;
         userToEdit.PhoneNumber = editedUser.PhoneNumber;
         userToEdit.MonthTimeGoal = (editedUser.MonthTimeGoal == null || editedUser.MonthTimeGoal == 0) ? 15 : editedUser.MonthTimeGoal;
@@ -167,9 +200,56 @@ public class UsersController : ControllerBase {
         }
     }
 
+
+    // [HttpPut("EditUserByIdQuery")]
+    // public async Task<IActionResult> EditUsrByIdQueryAsync([FromQuery] string userId, [FromBody] AppUserDto editedUser) {
+    //     if (string.IsNullOrEmpty(userId)) {
+    //         throw new UnauthorizedAccessException("No user is found");
+    //     }
+    //     var userToEdit = await userManager.Users
+    //         .Where(user => user.Id == userId)
+    //         .FirstOrDefaultAsync();
+    //     if (userToEdit == null) {
+    //         return NotFound("User ID was not found");
+    //     }
+    //     userToEdit.UserName = editedUser.UserName;
+    //     userToEdit.Email = editedUser.Email;
+    //     userToEdit.PhoneNumber = editedUser.PhoneNumber;
+    //     userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+    //     IdentityResult result = await userManager.UpdateAsync(userToEdit);
+    //     if (result.Succeeded) {
+    //         return Ok();
+    //     } else {
+    //         return BadRequest(result.Errors);
+    //     }
+    // }
+    
+    // [HttpPut("EditUserByIdQuery")]
+    // public async Task<IActionResult> EditUsrByIdQueryAsync([FromQuery] Guid userId, [FromBody] AppUserDto editedUser) {
+    //     if (userId == Guid.Empty) {
+    //         throw new UnauthorizedAccessException("No user is found");
+    //     }
+    //     var userToEdit = await userManager.Users
+    //         .Where(user => user.Id == userId)
+    //         .FirstOrDefaultAsync();
+    //     if (userToEdit == null) {
+    //         return NotFound("User ID was not found");
+    //     }
+    //     userToEdit.UserName = editedUser.UserName;
+    //     userToEdit.Email = editedUser.Email;
+    //     userToEdit.PhoneNumber = editedUser.PhoneNumber;
+    //     userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+    //     IdentityResult result = await userManager.UpdateAsync(userToEdit);
+    //     if (result.Succeeded) {
+    //         return Ok();
+    //     } else {
+    //         return BadRequest(result.Errors);
+    //     }
+    // }
+    
     [HttpPut("EditUserByIdQuery")]
-    public async Task<IActionResult> EditUsrByIdQueryAsync([FromQuery] string userId, [FromBody] AppUserDto editedUser) {
-        if (string.IsNullOrEmpty(userId)) {
+    public async Task<IActionResult> EditUsrByIdQueryAsync([FromQuery] Guid userId, [FromBody] AppUserDto editedUser) {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("No user is found");
         }
         var userToEdit = await userManager.Users
@@ -178,7 +258,7 @@ public class UsersController : ControllerBase {
         if (userToEdit == null) {
             return NotFound("User ID was not found");
         }
-        userToEdit.UserName = editedUser.Name;
+        userToEdit.UserName = editedUser.UserName;
         userToEdit.Email = editedUser.Email;
         userToEdit.PhoneNumber = editedUser.PhoneNumber;
         userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
@@ -204,19 +284,39 @@ public class UsersController : ControllerBase {
         }
     }
 
+    // [HttpPut("EditMonthTimeGoal")]
+    // public async Task<IActionResult> EditMonthTimeGoalAsyncQuery([FromQuery] string userId, [FromBody] AppUserDto editedUser) {
+    //     if (string.IsNullOrEmpty(userId)) {
+    //         throw new UnauthorizedAccessException("User not found");
+    //     }
+    //     var monthTimeGoalToEdit = await userManager.Users
+    //         .FirstOrDefaultAsync(record => record.Id == userId);
+    //     monthTimeGoalToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+    //     IdentityResult result = await userManager.UpdateAsync(monthTimeGoalToEdit);
+    //     if (result.Succeeded) {
+    //         return Ok();
+    //     } else {
+    //         return BadRequest(result.Errors);
+    //     }
+    // }
+    
     [HttpPut("EditMonthTimeGoal")]
-    public async Task<IActionResult> EditMonthTimeGoalAsyncQuery([FromQuery] string userId, [FromBody] AppUserDto editedUser) {
-        if (string.IsNullOrEmpty(userId)) {
+    public async Task<IActionResult> EditMonthTimeGoalAsyncQuery([FromQuery] Guid userId, [FromBody] AppUserDto editedUser) {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
-        var monthTimeGoalToEdit = await userManager.Users
+        var userToEdit = await userManager.Users
             .FirstOrDefaultAsync(record => record.Id == userId);
-        monthTimeGoalToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
-        IdentityResult result = await userManager.UpdateAsync(monthTimeGoalToEdit);
+        if (userToEdit == null) {
+            return NotFound("User ID was not found");
+        }
+        userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+        IdentityResult result = await userManager.UpdateAsync(userToEdit);
         if (result.Succeeded) {
             return Ok();
         } else {
             return BadRequest(result.Errors);
         }
     }
+
 }

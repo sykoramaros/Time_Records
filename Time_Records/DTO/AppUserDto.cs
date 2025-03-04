@@ -4,7 +4,7 @@ public class AppUserDto {
     // spravce zaregistruje uzivatele (uzivatel se nemuze klasicky zaregistrovat sam) registrace pres backend
     // id se databazi vygeneruje sama
     
-    public required string Name { get; set; }
+    public required string UserName { get; set; }
     public required string Email { get; set; }
     public string? Password { get; set; }
     public string? PhoneNumber { get; set; }

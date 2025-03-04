@@ -25,7 +25,7 @@ public class RecordsController : ControllerBase {
     }
     
     [HttpGet("GetAllRecordsQuery")]
-    public async Task<ActionResult<IEnumerable<RecordDto>>> GetAllRecordsQuery([FromQuery] string userId)
+    public async Task<ActionResult<IEnumerable<RecordDto>>> GetAllRecordsQuery([FromQuery] Guid userId)
     {
         var records = await recordService.GetAllRecordsQuery(userId);
         if (records == null || !records.Any())
@@ -37,7 +37,7 @@ public class RecordsController : ControllerBase {
     
     
     [HttpGet("GetRecordByDateQuery")]
-    public async Task<ActionResult<RecordDto>> GetRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
+    public async Task<ActionResult<RecordDto>> GetRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date) {
         var record = await recordService.GetRecordByDateQueryAsync(userId, date);
         if (record == null) {
             return NotFound("Record not found");
@@ -56,7 +56,7 @@ public class RecordsController : ControllerBase {
     
     
     [HttpPost("CreateRecordQuery")]
-    public async Task<ActionResult> CreateRecordQueryAsync([FromQuery] string userId, [FromBody] RecordDto recordDto) {
+    public async Task<ActionResult> CreateRecordQueryAsync([FromQuery] Guid userId, [FromBody] RecordDto recordDto) {
         if (!ModelState.IsValid) {
             return BadRequest(ModelState);
         }
@@ -71,7 +71,7 @@ public class RecordsController : ControllerBase {
     
     
     [HttpPut("EditRecordByDateQuery")]
-    public async Task<ActionResult> EditRecordByDateQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date, [FromBody] RecordDto editedRecord) {
+    public async Task<ActionResult> EditRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date, [FromBody] RecordDto editedRecord) {
         try {
             await recordService.EditRecordByDateQueryAsync(userId, date, editedRecord);
             return Ok();
@@ -85,7 +85,7 @@ public class RecordsController : ControllerBase {
     }
     
     [HttpDelete("DeleteRecordByDateQuery")]
-    public async Task<ActionResult> DeleteRecordQueryAsync([FromQuery] string userId, [FromQuery] DateOnly date) {
+    public async Task<ActionResult> DeleteRecordQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date) {
         try {
             await recordService.DeleteRecordByDateQueryAsync(userId, date);
             return Ok();

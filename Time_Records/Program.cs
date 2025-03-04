@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<GoogleAccountService>();
 builder.Services.AddScoped<RecordService>();
 builder.Services.AddScoped<RecordTimeService>();
 builder.Services.AddScoped<StudyService>();
@@ -25,7 +26,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
     );
 });
 
-builder.Services.AddIdentity<AppUser, IdentityRole>()
+// builder.Services.AddIdentity<AppUser, IdentityRole>()
+//     .AddEntityFrameworkStores<ApplicationDbContext>()
+//     .AddDefaultTokenProviders();
+
+// podpora GUID
+builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
