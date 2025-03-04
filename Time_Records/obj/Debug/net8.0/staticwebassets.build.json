@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "jt8FMDJruWW/ghMNUzznCb/zCmZZEykNSwEET6xIEu0=",
+  "Hash": "tUJaeFYDMpFWQ6Tg8ud0/MM45jm2OK5OCsOgWVbYfMY=",
   "Source": "Time_Records",
   "BasePath": "_content/Time_Records",
   "Mode": "Default",
@@ -47,10 +47,10 @@
       "OriginalItemSpec": "/Users/marosh/.nuget/packages/microsoft.aspnetcore.components.quickgrid/8.0.12/staticwebassets/QuickGrid.razor.js"
     },
     {
-      "Identity": "/Users/marosh/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Debug/net8.0/scopedcss/bundle/Time_Records.styles.css",
+      "Identity": "/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Debug/net8.0/scopedcss/bundle/Time_Records.styles.css",
       "SourceId": "Time_Records",
       "SourceType": "Computed",
-      "ContentRoot": "/Users/marosh/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Debug/net8.0/scopedcss/bundle/",
+      "ContentRoot": "/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Debug/net8.0/scopedcss/bundle/",
       "BasePath": "_content/Time_Records",
       "RelativePath": "Time_Records.styles.css",
       "AssetKind": "All",
@@ -63,7 +63,7 @@
       "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "/Users/marosh/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Debug/net8.0/scopedcss/bundle/Time_Records.styles.css"
+      "OriginalItemSpec": "/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Debug/net8.0/scopedcss/bundle/Time_Records.styles.css"
     }
   ]
 }

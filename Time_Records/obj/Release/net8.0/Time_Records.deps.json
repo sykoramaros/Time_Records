@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v8.0": {
       "Time_Records/1.0.0": {
         "dependencies": {
+          "Microsoft.AspNetCore.Authentication.Google": "8.0.13",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.12",
           "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter": "8.0.12",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "8.0.12",
@@ -31,6 +32,14 @@
         }
       },
       "Humanizer.Core/2.14.1": {},
+      "Microsoft.AspNetCore.Authentication.Google/8.0.13": {
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "assemblyVersion": "8.0.13.0",
+            "fileVersion": "8.0.1325.6610"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.12": {
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "7.1.2"
@@ -1333,6 +1342,13 @@
       "sha512": "sha512-lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
       "path": "humanizer.core/2.14.1",
       "hashPath": "humanizer.core.2.14.1.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.Google/8.0.13": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pHL4Q83J6vzE8zz6+fkEwxVW7sXKFeFGiuJysD/Cbvos8CxNZgh/tkKyA6l5J67SQw4TVh+w20OVXcoN+RnaAw==",
+      "path": "microsoft.aspnetcore.authentication.google/8.0.13",
+      "hashPath": "microsoft.aspnetcore.authentication.google.8.0.13.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.12": {
       "type": "package",

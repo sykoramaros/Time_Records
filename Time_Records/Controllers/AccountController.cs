@@ -1,9 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Time_Records.DTO;
 using Time_Records.Models;
 
@@ -94,6 +97,78 @@ public class AccountController : ControllerBase {
         }
         return BadRequest(new { message = "Invalid model state", errors = ModelState });
     }
+    
+    // [HttpGet("Google-login")]
+    // public IActionResult GoogleLogin() 
+    // {
+    //     // Explicitně nastavte absolute URL
+    //     var redirectUrl = Url.Action(
+    //         action: "GoogleLoginCallback", 
+    //         controller: "Account", 
+    //         values: null, 
+    //         protocol: Request.Scheme,
+    //         host: Request.Host.Value);
+    //
+    //     if (string.IsNullOrEmpty(redirectUrl))
+    //     {
+    //         return BadRequest("Redirect URL is null or empty");
+    //     }
+    //
+    //     // Pro debug vypište URL
+    //     Console.WriteLine($"Redirect URL: {redirectUrl}");
+    //
+    //     return Challenge(
+    //         new AuthenticationProperties { RedirectUri = redirectUrl }, 
+    //         GoogleDefaults.AuthenticationScheme);
+    // }
+    
+    // [HttpGet("Google-login")]
+    // public IActionResult GoogleLogin() 
+    // {
+    //     // Použijte přesně stejnou redirect URL jako v Google Console
+    //     var redirectUrl = "https://localhost:7081/api/Account/Google-login-callback";
+    //
+    //     return Challenge(
+    //         new AuthenticationProperties { RedirectUri = redirectUrl }, 
+    //         GoogleDefaults.AuthenticationScheme);
+    // }
+    
+    // [HttpGet("Google-login")]
+    // public IActionResult GoogleLogin()
+    // {
+    //     var properties = new AuthenticationProperties
+    //     {
+    //         RedirectUri = "https://localhost:7081/api/Account/Google-login-callback",
+    //         // Přidejte tyto řádky pro řešení problému se stavem
+    //         Items =
+    //         {
+    //             { ".xsrf", "true" },
+    //             { "scheme", GoogleDefaults.AuthenticationScheme },
+    //         },
+    //         IsPersistent = true
+    //     };
+    //
+    //     return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+    // }
+    //
+    // [HttpGet("Google-login-callback")]
+    // public async Task<IActionResult> GoogleLoginCallback() {
+    //     var authenticationResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    //     if (!authenticationResult.Succeeded) {
+    //         return Unauthorized();
+    //     }
+    //     var claims = authenticationResult.Principal.Identities.FirstOrDefault()?.Claims;
+    //     var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+    //     var userName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+    //     var user = await userManager.FindByEmailAsync(email);
+    //     if (user == null) {
+    //         user = new AppUser { UserName = userName, Email = email };
+    //         await userManager.CreateAsync(user);
+    //     }
+    //     await signInManager.SignInAsync(user, false);
+    //     return Ok(new { message = "Login successful", returnUrl = "/login" });
+    // }
+    
 
     [HttpPost("Logout")]
     public async Task<IActionResult> Logout() {

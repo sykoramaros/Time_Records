@@ -1,4 +1,6 @@
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +52,12 @@ builder.Services.AddSwaggerGen();
 // Nesmíš použít AllowAnyOrigin() spolu s AllowCredentials(), protože to prohlížeč nepovolí.
 builder.Services.AddCors(options => {
     options.AddPolicy("MyCorsPolicy", builder => {
-        builder.WithOrigins("https://sykoramaros.github.io", "http://localhost:3000")
+        builder.WithOrigins(
+                "https://sykoramaros.github.io",
+                "http://localhost:3000",
+                "http://localhost:5113",
+                "https://localhost:7081",
+                "https://recordsapi.runasp.net" )
         // builder.AllowAnyOrigin()
             .AllowCredentials()
             .AllowAnyMethod()
@@ -69,6 +76,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
         };
     });
+
+// autentifikace pro Google
+// builder.Services.AddAuthentication(options => {
+//         options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//         options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+//     })
+//     .AddCookie(options => {
+//         options.Cookie.HttpOnly = true;
+//         options.Cookie.SameSite = SameSiteMode.Lax;
+//         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//     })
+//     .AddGoogle(options => {
+//         options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+//         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+//         options.CallbackPath = "/api/Account/Google-login-callback";
+//         options.SaveTokens = true;
+//     });
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

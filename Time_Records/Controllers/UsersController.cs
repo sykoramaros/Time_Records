@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Time_Records.DTO;
 using Time_Records.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Google.Apis.Auth;
 
 namespace Time_Records.Controllers;
 
@@ -12,13 +14,21 @@ public class UsersController : ControllerBase {
     private UserManager<AppUser> userManager;
     private IPasswordHasher<AppUser> passwordHasher;
     private IPasswordValidator<AppUser> passwordValidator;
+    private IConfiguration configuration;
 
     public UsersController(UserManager<AppUser> userManager, IPasswordHasher<AppUser> passwordHasher, IPasswordValidator<AppUser> passwordValidator) {
         this.userManager = userManager;
         this.passwordHasher = passwordHasher;
         this.passwordValidator = passwordValidator;
     }
-    
+
+    public UsersController(UserManager<AppUser> userManager, IPasswordHasher<AppUser> passwordHasher, IPasswordValidator<AppUser> passwordValidator, IConfiguration configuration) {
+        this.userManager = userManager;
+        this.passwordHasher = passwordHasher;
+        this.passwordValidator = passwordValidator;
+        this.configuration = configuration;
+    }
+
     [HttpGet("GetAllUsers")]
     public async Task<IActionResult> GetAllUsers() {
         var users = await userManager.Users.ToListAsync();
@@ -79,7 +89,65 @@ public class UsersController : ControllerBase {
             return BadRequest(ModelState);
         }
     }
-    
+
+    [HttpPost("CreateGoogleUser")]
+    public async Task<IActionResult> CreateGoogleUser([FromBody] AppUserDto newUser) {
+        if (ModelState.IsValid) {
+            try {
+                // Ověření tokenu
+                var googlePayload = await VerifyGoogleToken(newUser.GoogleToken);
+                if (googlePayload == null) {
+                    return Unauthorized(new { message = "Invalid Google token" });
+                }
+                // Ověření, zda uživatel již existuje podle emailu
+                var existingUser = await userManager.FindByEmailAsync(newUser.Email);
+                if (existingUser != null) {
+                    return BadRequest("User with this email already exists");
+                }
+                // Vytvoření nového uživatele
+                AppUser appUser = new AppUser {
+                    UserName = newUser.Name,
+                    Email = newUser.Email,
+                    PhoneNumber = newUser.PhoneNumber,
+                    MonthTimeGoal = newUser.MonthTimeGoal ?? 15 // Defaultní hodnota pro MonthTimeGoal
+                };
+                IdentityResult result = await userManager.CreateAsync(appUser, newUser.Password);
+                if (result.Succeeded) {
+                    return Ok(new {
+                        success = true,
+                        user = new { 
+                            appUser.Id, 
+                            appUser.UserName, 
+                            appUser.Email, 
+                            appUser.PhoneNumber, 
+                            appUser.MonthTimeGoal 
+                        }
+                    });
+                }
+                return BadRequest(result.Errors);
+            }
+            catch (Exception ex) {
+                return BadRequest(new { message = ex.Message });
+            }
+        } else {
+            return BadRequest(ModelState);
+        }
+    }
+
+    // Funkce pro ověření Google tokenu
+    private async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(string googleToken)  {
+        try {
+            var settings = new GoogleJsonWebSignature.ValidationSettings() {
+                Audience = new List<string> { "680830179798-oquu7npstv9ofbpv781kq9usq7nfjqtg.apps.googleusercontent.com" } // Vaše Client ID z Google
+            };
+            var payload = await GoogleJsonWebSignature.ValidateAsync(googleToken, settings);
+            return payload; // Pokud je token validní, vrátí payload, který obsahuje informace o uživateli
+        }
+        catch (Exception ex) {
+            // Logování chyby nebo zpracování neplatného tokenu
+            return null;
+        }
+    }
     
     [HttpPut("EditUser/{id}")]
     public async Task<IActionResult> EditUser(string id, [FromBody] AppUserDto editedUser) {
