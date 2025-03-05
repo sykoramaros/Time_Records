@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IGoogleAccountService, GoogleAccountService>();
 builder.Services.AddScoped<GoogleAccountService>();
 builder.Services.AddScoped<RecordService>();
 builder.Services.AddScoped<RecordTimeService>();

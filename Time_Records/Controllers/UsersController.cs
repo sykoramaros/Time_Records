@@ -71,7 +71,6 @@ public class UsersController : ControllerBase {
         }
         return Ok(user);
     }
-
     
     [HttpGet("GetByUserEmail/{email}")]
     public async Task<IActionResult> GetUserByEmail(string email) {
@@ -102,65 +101,6 @@ public class UsersController : ControllerBase {
             return BadRequest(result.Errors);
         } else {
             return BadRequest(ModelState);
-        }
-    }
-
-    [HttpPost("CreateGoogleUser")]
-    public async Task<IActionResult> CreateGoogleUser([FromBody] AppUserDto newUser) {
-        if (ModelState.IsValid) {
-            try {
-                // Ověření tokenu
-                var googlePayload = await VerifyGoogleToken(newUser.GoogleToken);
-                if (googlePayload == null) {
-                    return Unauthorized(new { message = "Invalid Google token" });
-                }
-                // Ověření, zda uživatel již existuje podle emailu
-                var existingUser = await userManager.FindByEmailAsync(newUser.Email);
-                if (existingUser != null) {
-                    return BadRequest("User with this email already exists");
-                }
-                // Vytvoření nového uživatele
-                AppUser appUser = new AppUser {
-                    UserName = newUser.UserName,
-                    Email = newUser.Email,
-                    PhoneNumber = newUser.PhoneNumber,
-                    MonthTimeGoal = newUser.MonthTimeGoal ?? 15 // Defaultní hodnota pro MonthTimeGoal
-                };
-                IdentityResult result = await userManager.CreateAsync(appUser, newUser.Password);
-                if (result.Succeeded) {
-                    return Ok(new {
-                        success = true,
-                        user = new { 
-                            appUser.Id, 
-                            appUser.UserName, 
-                            appUser.Email, 
-                            appUser.PhoneNumber, 
-                            appUser.MonthTimeGoal 
-                        }
-                    });
-                }
-                return BadRequest(result.Errors);
-            }
-            catch (Exception ex) {
-                return BadRequest(new { message = ex.Message });
-            }
-        } else {
-            return BadRequest(ModelState);
-        }
-    }
-
-    // Funkce pro ověření Google tokenu
-    private async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(string googleToken)  {
-        try {
-            var settings = new GoogleJsonWebSignature.ValidationSettings() {
-                Audience = new List<string> { "680830179798-oquu7npstv9ofbpv781kq9usq7nfjqtg.apps.googleusercontent.com" } // Vaše Client ID z Google
-            };
-            var payload = await GoogleJsonWebSignature.ValidateAsync(googleToken, settings);
-            return payload; // Pokud je token validní, vrátí payload, který obsahuje informace o uživateli
-        }
-        catch (Exception ex) {
-            // Logování chyby nebo zpracování neplatného tokenu
-            return null;
         }
     }
     
@@ -199,8 +139,7 @@ public class UsersController : ControllerBase {
             return BadRequest(result.Errors);
         }
     }
-
-
+    
     // [HttpPut("EditUserByIdQuery")]
     // public async Task<IActionResult> EditUsrByIdQueryAsync([FromQuery] string userId, [FromBody] AppUserDto editedUser) {
     //     if (string.IsNullOrEmpty(userId)) {

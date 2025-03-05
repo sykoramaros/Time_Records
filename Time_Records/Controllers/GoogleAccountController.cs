@@ -10,20 +10,20 @@ namespace Time_Records.Controllers;
 [ApiController]
 public class GoogleAccountController : ControllerBase {
     private UserManager<AppUser> userManager;
+    
+    private readonly IGoogleAccountService iGoogleAccountService;
     // private RoleManager<IdentityRole>? roleManager;
     // private SignInManager<AppUser> signInManager;
     private GoogleAccountService googleAccountService;
 
-
-    // public GoogleAccountController(UserManager<AppUser> userManager, RoleManager<IdentityRole>? roleManager, SignInManager<AppUser> signInManager, GoogleAccountService googleAccountService) {
+    // public GoogleAccountController(UserManager<AppUser> userManager, GoogleAccountService googleAccountService) {
     //     this.userManager = userManager;
-    //     // this.roleManager = roleManager;
-    //     // this.signInManager = signInManager;
     //     this.googleAccountService = googleAccountService;
     // }
 
-    public GoogleAccountController(UserManager<AppUser> userManager, GoogleAccountService googleAccountService) {
+    public GoogleAccountController(UserManager<AppUser> userManager, IGoogleAccountService iGoogleAccountService, GoogleAccountService googleAccountService) {
         this.userManager = userManager;
+        this.iGoogleAccountService = iGoogleAccountService;
         this.googleAccountService = googleAccountService;
     }
 
@@ -43,5 +43,26 @@ public class GoogleAccountController : ControllerBase {
             return BadRequest("Registration is not successfull");
         }
         return Ok(user);
+    }
+    
+    [HttpPost("RegisterNewUserFromGoogleAsync")]
+    public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] GoogleAuthDto googleAuthDto) {
+        if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
+            return BadRequest("Token is missing");
+        }
+        try {
+            var user = await iGoogleAccountService.RegisterNewUserFromGoogleAsync(
+                googleAuthDto.IdToken,
+                googleAuthDto.MonthTimeGoal);
+            return Ok(new {
+                user.Id,
+                user.UserName,
+                user.Email,
+                user.GoogleId,
+                user.MonthTimeGoal
+            });
+        } catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
     }
 }
