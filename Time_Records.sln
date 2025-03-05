@@ -1,7 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ministry_Records", "Ministry_Records\Ministry_Records.csproj", "{B5F961F1-F4A9-401D-9992-E9A6F85D2A2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Time_Records", "Time_Records\Time_Records.csproj", "{B5F961F1-F4A9-401D-9992-E9A6F85D2A2D}"
 EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
