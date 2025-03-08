@@ -25,11 +25,9 @@ public class RecordsController : ControllerBase {
     }
     
     [HttpGet("GetAllRecordsQuery")]
-    public async Task<ActionResult<IEnumerable<RecordDto>>> GetAllRecordsQuery([FromQuery] Guid userId)
-    {
+    public async Task<ActionResult<IEnumerable<RecordDto>>> GetAllRecordsQuery([FromQuery] Guid userId) {
         var records = await recordService.GetAllRecordsQuery(userId);
-        if (records == null || !records.Any())
-        {
+        if (records == null || !records.Any()) {
             return NotFound("No records found");
         }
         return Ok(records);

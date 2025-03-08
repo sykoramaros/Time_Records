@@ -104,10 +104,11 @@ public class GoogleAccountService : IGoogleAccountService {
         }
 
         var claims = new List<Claim> {
-            new Claim(ClaimTypes.NameIdentifier, existingUser.Id.ToString()),
+            new Claim("Id", existingUser.Id.ToString()),    // Převod Guid na string
             new Claim(ClaimTypes.Name, existingUser.UserName),
             new Claim(ClaimTypes.Email, existingUser.Email),
             new Claim("GoogleId", existingUser.GoogleId),
+            new Claim("PhoneNumber", existingUser.PhoneNumber ?? ""),
             new Claim("MonthTimeGoal", existingUser.MonthTimeGoal.ToString())
         };
         
@@ -136,6 +137,5 @@ public class GoogleAccountService : IGoogleAccountService {
 
         return googleAuthLoginDto;
     }
-    
     // Logout na backendu neni nutny ale na frontendu byt muze
 }

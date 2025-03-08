@@ -111,10 +111,12 @@ public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
             );
             if (signInResult.Succeeded) {
                 var claims = new List<Claim> {
+                    new Claim("Id", appUser.Id.ToString()), // Převod Guid na string
                     new Claim(ClaimTypes.Name, appUser.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()), // Převod Guid na string
                     new Claim(ClaimTypes.Email, appUser.Email),
-                    new Claim(ClaimTypes.MobilePhone, appUser.PhoneNumber ?? "")
+                    new Claim("GoogleId", appUser.GoogleId ?? ""),
+                    new Claim("PhoneNumber", appUser.PhoneNumber ?? ""),
+                    new Claim("MonthTimeGoal", appUser.MonthTimeGoal.ToString())
                 };
                 var userRoles = await userManager.GetRolesAsync(appUser);
                 foreach (var role in userRoles) {

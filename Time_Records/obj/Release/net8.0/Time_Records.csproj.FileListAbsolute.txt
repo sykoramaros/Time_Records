@@ -281,3 +281,8 @@
 /Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Release/net8.0/Time_Records.pdb
 /Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Release/net8.0/Time_Records.genruntimeconfig.cache
 /Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/obj/Release/net8.0/ref/Time_Records.dll
+/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/bin/Release/net8.0/Google.Apis.dll
+/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/bin/Release/net8.0/Google.Apis.Auth.dll
+/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/bin/Release/net8.0/Google.Apis.Core.dll
+/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/bin/Release/net8.0/System.Management.dll
+/Users/marosh/IT/RiderProjects/ASPNET/vlastni/Time_Records/Time_Records_Csharp/Time_Records/bin/Release/net8.0/runtimes/win/lib/net7.0/System.Management.dll
