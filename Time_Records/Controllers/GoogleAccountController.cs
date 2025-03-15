@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -31,7 +32,7 @@ public class GoogleAccountController : ControllerBase {
     //     this.iGoogleAccountService = iGoogleAccountService;
     //     this.googleAccountService = googleAccountService;
     // }
-
+    
     public GoogleAccountController(UserManager<AppUser> userManager, IConfiguration configuration, IGoogleAccountService iGoogleAccountService, GoogleAccountService googleAccountService) {
         this.userManager = userManager;
         this.configuration = configuration;
@@ -48,6 +49,7 @@ public class GoogleAccountController : ControllerBase {
         return Ok("Token is valid");
     }
     
+    [AllowAnonymous]
     [HttpPost("RegisterNewUserFromGoogleAsync")]
     public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] GoogleAuthDto googleAuthDto) {
         if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
@@ -69,6 +71,7 @@ public class GoogleAccountController : ControllerBase {
         }
     }
     
+    [AllowAnonymous]
     [HttpPost("GoogleLogin")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthDto googleAuthDto) {
         if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {

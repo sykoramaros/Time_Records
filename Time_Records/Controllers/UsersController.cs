@@ -5,6 +5,7 @@ using Time_Records.DTO;
 using Time_Records.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Time_Records.Controllers;
 
@@ -29,6 +30,7 @@ public class UsersController : ControllerBase {
     //     this.configuration = configuration;
     // }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("GetAllUsers")]
     public async Task<IActionResult> GetAllUsers() {
         var users = await userManager.Users.ToListAsync();
@@ -81,6 +83,7 @@ public class UsersController : ControllerBase {
         return Ok(user);
     }
     
+    [Authorize(Roles = "Admin")]
     [HttpPost("CreateUser")]
     public async Task<IActionResult> CreateUser([FromBody] AppUserDto newUser) {
         if (ModelState.IsValid) {
@@ -191,9 +194,10 @@ public class UsersController : ControllerBase {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("No user is found");
         }
-        var userToEdit = await userManager.Users
-            .Where(user => user.Id == userId)
-            .FirstOrDefaultAsync();
+        var userToEdit = await userManager.FindByIdAsync(userId.ToString());
+        // var userToEdit = await userManager.Users
+        //     .Where(user => user.Id == userId)
+            // .FirstOrDefaultAsync();
         if (userToEdit == null) {
             return NotFound("User ID was not found");
         }
@@ -209,6 +213,7 @@ public class UsersController : ControllerBase {
         }
     }
     
+    [Authorize(Roles = "Admin")]
     [HttpDelete("DeleteUser/{id}")]
     public async Task<IActionResult> DeleteUser(string id) {
         var userToDelete = await userManager.FindByIdAsync(id);

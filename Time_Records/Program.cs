@@ -32,7 +32,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
 //     .AddDefaultTokenProviders();
 
 // podpora GUID
-builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>()
+builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options => {
+        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 

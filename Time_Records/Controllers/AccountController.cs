@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Time_Records.DTO;
 using Time_Records.Models;
 
 namespace Time_Records.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class AccountController : ControllerBase {
@@ -98,6 +100,8 @@ public class AccountController : ControllerBase {
     //     return BadRequest(new { message = "Invalid model state", errors = ModelState });
     // }
     
+    
+    [AllowAnonymous]
     [HttpPost("Jwt-login")]
 public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
     if (ModelState.IsValid) {
@@ -217,7 +221,7 @@ public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
     //     return Ok(new { message = "Login successful", returnUrl = "/login" });
     // }
     
-
+    [Authorize]
     [HttpPost("Logout")]
     public async Task<IActionResult> Logout() {
         await signInManager.SignOutAsync();
