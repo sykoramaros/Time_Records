@@ -15,82 +15,6 @@ public class RecordsTimeController : ControllerBase {
     }
     
     
-    // [HttpGet("SumActualMinistryYearTotalRecordTimeQuery")]
-    // public async Task<ActionResult<TimeFormatDto>> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] string userId) {
-    //     var sum = await recordTimeService.SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
-    //     if (sum == null) {
-    //         return NotFound("No records found");
-    //     }
-    //     return Ok(sum);
-    // }
-    // [HttpGet("YearRecordProgressQuery")]
-    // public async Task<ActionResult<double>> YearRecordProgressQueryAsync([FromQuery] string userId) {
-    //     var yearPercentageProgress = await recordTimeService.YearRecordProgressQueryAsync(userId);
-    //     if (double.IsInfinity(yearPercentageProgress)) {
-    //         return BadRequest("The result is Infinity, which is not valid.");
-    //     }
-    //
-    //     return Ok(yearPercentageProgress);
-    // }
-    // [HttpGet("YearRemainingTimeQuery")]
-    // public async Task<ActionResult<TimeFormatDto>> YearRemainingTimeQueryAsync([FromQuery] string userId) {
-    //     var remainingTime = await recordTimeService.YearRemainingTimeQueryAsync(userId);
-    //     return Ok(remainingTime);
-    // }
-    // [HttpGet("SumActualMonthTotalRecordTimeQuery")]
-    // public async Task<ActionResult<TimeFormatDto>> SumActualMonthTotalRecordTimeQueryAsync([FromQuery] string userId) {
-    //     var sum = await recordTimeService.SumActualMonthTotalRecordTimeQueryAsync(userId);
-    //     if (sum == null) {
-    //         return NotFound("No records found");
-    //     }
-    //     return Ok(sum);
-    // }
-    // [HttpGet("MonthRecordProgressQuery")]
-    // public async Task<ActionResult<double>> MonthRecordProgressQueryAsync([FromQuery] string userId) {
-    //     var monthPercentageProgress = await recordTimeService.MonthRecordProgressQueryAsync(userId);
-    //     if (double.IsInfinity(monthPercentageProgress)) {
-    //         return BadRequest("The result is Infinity, which is not valid.");
-    //     }
-    //
-    //     return Ok(monthPercentageProgress);
-    // }
-    // [HttpGet("MonthRemainingTimeQuery")]
-    // public async Task<ActionResult<TimeFormatDto>> MonthRemainingTimeQueryAsync([FromQuery] string userId) {
-    //     var remainingTime = await recordTimeService.MonthRemainingTimeQueryAsync(userId);
-    //     return Ok(remainingTime);
-    // }
-    // [HttpGet("SumActualWeekTotalRecordTimeQuery")]
-    // public async Task<ActionResult<TimeFormatDto>> SumActualWeekTotalRecordTimeQueryAsync([FromQuery] string userId) {
-    //     var sum = await recordTimeService.SumActualWeekTotalRecordTimeQueryAsync(userId);
-    //     if (sum == null) {
-    //         return NotFound("No records found");
-    //     }
-    //     return Ok(sum);
-    // }
-    //
-    // [HttpGet("WeekRecordProgressQuery")]
-    // public async Task<ActionResult<double>> WeekRecordProgressQueryAsync([FromQuery] string userId) {
-    //     var weekPercentageProgress = await recordTimeService.WeekRecordProgressQueryAsync(userId);
-    //     if (double.IsInfinity(weekPercentageProgress)) {
-    //         return BadRequest("The result is Infinity, which is not valid.");
-    //     }
-    //     return Ok(weekPercentageProgress);
-    // }
-    // [HttpGet("WeekRemainingTimeQuery")]
-    // public async Task<ActionResult<TimeFormatDto>> WeekRemainingTimeQueryAsync([FromQuery] string userId) {
-    //     var remainingTime = await recordTimeService.WeekRemainingTimeQueryAsync(userId);
-    //     return Ok(remainingTime);
-    // }
-    //
-    // [HttpGet("GetMonthTimeGoalQuery")]
-    // public async Task<ActionResult<int>> GetMonthTimeGoalQueryAsync([FromQuery] string userId) {
-    //     var monthTimeGoal = await recordTimeService.GetMonthTimeGoalAsyncQuery(userId);
-    //     if (monthTimeGoal == null) {
-    //         return BadRequest("Month time goal cannot be zero");
-    //     }
-    //     return Ok(monthTimeGoal);
-    // }
-    
     [HttpGet("SumActualMinistryYearTotalRecordTimeQuery")]
 public async Task<ActionResult<TimeFormatDto>> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
     var sum = await recordTimeService.SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
@@ -172,6 +96,92 @@ public async Task<ActionResult<int>> GetMonthTimeGoalQueryAsync([FromQuery] Guid
     return Ok(monthTimeGoal);
 }
 
+[HttpGet("SumChosenMonthTotalRecordTimeQuery")]
+public async Task<ActionResult<TimeFormatDto>> SumChosenMonthTotalRecordTimeQueryAsync([FromQuery] Guid userId, [FromQuery] int chosenMonth, [FromQuery] int chosenYear) {
+    var sum = await recordTimeService.SumChosenMonthTotalRecordTimeQueryAsync(userId, chosenMonth, chosenYear);
+    if (sum == null) {
+        return NotFound("No records found");
+    }
+
+    return Ok(sum);
+}
+
+    
+    // [HttpGet("SumActualMinistryYearTotalRecordTimeQuery")]
+    // public async Task<ActionResult<TimeFormatDto>> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] string userId) {
+    //     var sum = await recordTimeService.SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
+    //     if (sum == null) {
+    //         return NotFound("No records found");
+    //     }
+    //     return Ok(sum);
+    // }
+    // [HttpGet("YearRecordProgressQuery")]
+    // public async Task<ActionResult<double>> YearRecordProgressQueryAsync([FromQuery] string userId) {
+    //     var yearPercentageProgress = await recordTimeService.YearRecordProgressQueryAsync(userId);
+    //     if (double.IsInfinity(yearPercentageProgress)) {
+    //         return BadRequest("The result is Infinity, which is not valid.");
+    //     }
+    //
+    //     return Ok(yearPercentageProgress);
+    // }
+    // [HttpGet("YearRemainingTimeQuery")]
+    // public async Task<ActionResult<TimeFormatDto>> YearRemainingTimeQueryAsync([FromQuery] string userId) {
+    //     var remainingTime = await recordTimeService.YearRemainingTimeQueryAsync(userId);
+    //     return Ok(remainingTime);
+    // }
+    // [HttpGet("SumActualMonthTotalRecordTimeQuery")]
+    // public async Task<ActionResult<TimeFormatDto>> SumActualMonthTotalRecordTimeQueryAsync([FromQuery] string userId) {
+    //     var sum = await recordTimeService.SumActualMonthTotalRecordTimeQueryAsync(userId);
+    //     if (sum == null) {
+    //         return NotFound("No records found");
+    //     }
+    //     return Ok(sum);
+    // }
+    // [HttpGet("MonthRecordProgressQuery")]
+    // public async Task<ActionResult<double>> MonthRecordProgressQueryAsync([FromQuery] string userId) {
+    //     var monthPercentageProgress = await recordTimeService.MonthRecordProgressQueryAsync(userId);
+    //     if (double.IsInfinity(monthPercentageProgress)) {
+    //         return BadRequest("The result is Infinity, which is not valid.");
+    //     }
+    //
+    //     return Ok(monthPercentageProgress);
+    // }
+    // [HttpGet("MonthRemainingTimeQuery")]
+    // public async Task<ActionResult<TimeFormatDto>> MonthRemainingTimeQueryAsync([FromQuery] string userId) {
+    //     var remainingTime = await recordTimeService.MonthRemainingTimeQueryAsync(userId);
+    //     return Ok(remainingTime);
+    // }
+    // [HttpGet("SumActualWeekTotalRecordTimeQuery")]
+    // public async Task<ActionResult<TimeFormatDto>> SumActualWeekTotalRecordTimeQueryAsync([FromQuery] string userId) {
+    //     var sum = await recordTimeService.SumActualWeekTotalRecordTimeQueryAsync(userId);
+    //     if (sum == null) {
+    //         return NotFound("No records found");
+    //     }
+    //     return Ok(sum);
+    // }
+    //
+    // [HttpGet("WeekRecordProgressQuery")]
+    // public async Task<ActionResult<double>> WeekRecordProgressQueryAsync([FromQuery] string userId) {
+    //     var weekPercentageProgress = await recordTimeService.WeekRecordProgressQueryAsync(userId);
+    //     if (double.IsInfinity(weekPercentageProgress)) {
+    //         return BadRequest("The result is Infinity, which is not valid.");
+    //     }
+    //     return Ok(weekPercentageProgress);
+    // }
+    // [HttpGet("WeekRemainingTimeQuery")]
+    // public async Task<ActionResult<TimeFormatDto>> WeekRemainingTimeQueryAsync([FromQuery] string userId) {
+    //     var remainingTime = await recordTimeService.WeekRemainingTimeQueryAsync(userId);
+    //     return Ok(remainingTime);
+    // }
+    //
+    // [HttpGet("GetMonthTimeGoalQuery")]
+    // public async Task<ActionResult<int>> GetMonthTimeGoalQueryAsync([FromQuery] string userId) {
+    //     var monthTimeGoal = await recordTimeService.GetMonthTimeGoalAsyncQuery(userId);
+    //     if (monthTimeGoal == null) {
+    //         return BadRequest("Month time goal cannot be zero");
+    //     }
+    //     return Ok(monthTimeGoal);
+    // }
 
     // [HttpGet("SumTotalRecordTime")]
     // public async Task<ActionResult<(int hours, int minutes)>> SumTotalRecordTimeAsync() {

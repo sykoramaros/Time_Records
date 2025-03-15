@@ -204,7 +204,7 @@ public class UsersController : ControllerBase {
         userToEdit.UserName = editedUser.UserName;
         userToEdit.Email = editedUser.Email;
         userToEdit.PhoneNumber = editedUser.PhoneNumber;
-        userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal;
+        userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal == null || editedUser.MonthTimeGoal == 0 ? 15 : editedUser.MonthTimeGoal;
         IdentityResult result = await userManager.UpdateAsync(userToEdit);
         if (result.Succeeded) {
             return Ok();

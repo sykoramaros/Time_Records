@@ -21,27 +21,6 @@ public class RecordTimeService {
         this.httpContextAccessor = httpContextAccessor;
     }
     
-    // public async Task<TimeFormatDto> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] string userId) {
-    //     if (string.IsNullOrEmpty(userId)) {
-    //         throw new UnauthorizedAccessException("User not found");
-    //     }
-    //     var actualYear = DateTime.Now.Year;
-    //     var startMinistryYear = new DateOnly(actualYear - 1, 9, 1);
-    //     var endMinistryYear = new DateOnly(actualYear, 8, 31);
-    //     var actualYearRecords = await dbContext.Records
-    //         .Where(record =>
-    //             record.IdentityUserId == userId &&
-    //             record.Date >= startMinistryYear &&
-    //             record.Date <= endMinistryYear)
-    //         .ToListAsync();
-    //     var totalTime = actualYearRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
-    //     return new TimeFormatDto() 
-    //     { 
-    //         Hours = (int)totalTime.TotalHours,
-    //         Minutes = totalTime.Minutes
-    //     };
-    // }
-    
     public async Task<TimeFormatDto> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
@@ -63,6 +42,207 @@ public class RecordTimeService {
             Minutes = totalTime.Minutes
         };
     }
+    
+    public async Task<double> YearRecordProgressQueryAsync([FromQuery] Guid userId) {
+        var yearTotalRecord = await SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
+        var yearHoursQuote = monthTimeGoal * 12.0;
+        var percentageYearProgress = (hoursAndMinutes * 100.0) / yearHoursQuote;
+        return Math.Round(percentageYearProgress);
+    }
+    
+    public async Task<TimeFormatDto> YearRemainingTimeQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var yearTotalRecord = await SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var yearHoursQuote = monthTimeGoal * 12.0;
+        var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
+        var remainingTime = yearHoursQuote - hoursAndMinutes;
+
+        return new TimeFormatDto()
+        { 
+            Hours = (int)remainingTime,
+            Minutes = (int)((remainingTime - (int)remainingTime) * 60)
+        };
+    }
+    
+    public async Task<TimeFormatDto> SumActualMonthTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var actualMonth = DateTime.Now.Month;
+        var actualYear = DateTime.Now.Year;
+        var userIdString = userId.ToString();
+        var actualMonthRecords = await dbContext.Records
+            .Where(record =>
+                record.IdentityUserId == Guid.Parse(userIdString) &&
+                record.Date.Year == actualYear &&
+                record.Date.Month == actualMonth)
+            .ToListAsync();
+    
+        var totalTime = actualMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+        return new TimeFormatDto() 
+        { 
+            Hours = (int)totalTime.TotalHours,
+            Minutes = totalTime.Minutes
+        };
+    }
+    
+    public async Task<double> MonthRecordProgressQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var hoursAndMinutes = monthTotalRecord.Hours + (monthTotalRecord.Minutes / 60.0);
+        var percentageMonthProgress = (hoursAndMinutes * 100.0) / monthTimeGoal;
+        return Math.Round(percentageMonthProgress);
+    }
+    
+    public async Task<TimeFormatDto> MonthRemainingTimeQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
+        var hoursAndMinutes = monthTotalRecord.Hours + (monthTotalRecord.Minutes / 60.0);
+        var remainingTime = monthTimeGoal - hoursAndMinutes;
+        return new TimeFormatDto()
+        { 
+            Hours = (int)remainingTime,
+            Minutes = (int)((remainingTime - (int)remainingTime) * 60)
+        };
+    }
+    
+    public async Task<TimeFormatDto> SumActualWeekTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        // Převedeme DayOfWeek na hodnotu, kde pondělí = 1, neděle = 7
+        var actualDay = DateTime.Now;
+        int dayOfWeek;
+        if (actualDay.DayOfWeek == DayOfWeek.Sunday) {
+            dayOfWeek = 7;
+        } else {
+            dayOfWeek = (int)actualDay.DayOfWeek;
+        }
+        // Vypočítáme pondělí daného týdne
+        var startOfWeek = actualDay.AddDays(-(dayOfWeek - 1)).Date;
+        var endOfWeek = startOfWeek.AddDays(7);
+        var userIdString = userId.ToString();
+        var weekRecords = await dbContext.Records
+            .Where(record =>
+                record.IdentityUserId == Guid.Parse(userIdString) &&
+                record.Date >= DateOnly.FromDateTime(startOfWeek) &&
+                record.Date < DateOnly.FromDateTime(endOfWeek))
+            .ToListAsync();
+        var totalTime = weekRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+        return new TimeFormatDto() 
+        { 
+            Hours = (int)totalTime.TotalHours,
+            Minutes = totalTime.Minutes
+        };
+    }
+    
+    public async Task<double> WeekRecordProgressQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var weekTimeQuote = monthTimeGoal / 4.0; 
+        var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
+        var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
+        var percentageWeekProgress = (hoursAndMinutes * 100.0) / weekTimeQuote;
+        return Math.Round(percentageWeekProgress);
+    }
+    
+    public async Task<TimeFormatDto> WeekRemainingTimeQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
+        var weekTimeQuote = monthTimeGoal / 4.0; 
+        var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
+        var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
+        var remainingTime = weekTimeQuote - hoursAndMinutes;
+        return new TimeFormatDto()
+        { 
+            Hours = (int)remainingTime,
+            Minutes = (int)((remainingTime - (int)remainingTime) * 60)
+        };
+    }
+    
+    public async Task<int> GetMonthTimeGoalAsyncQuery([FromQuery] Guid userId) {
+        if (userId == Guid.Empty) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+
+        var monthTimeGoal = await userManager.Users
+            .Where(user => user.Id == userId)
+            .Select(user => user.MonthTimeGoal)
+            .FirstOrDefaultAsync() ?? 0;
+        // if (monthTimeGoal == 0) {
+        //     throw new InvalidOperationException("Month time goal cannot be zero");
+        // }
+        return monthTimeGoal;
+    }
+
+    public async Task<TimeFormatDto> SumChosenMonthTotalRecordTimeQueryAsync([FromQuery] Guid userId,
+        [FromQuery] int chosenMonth, [FromQuery] int chosenYear) {
+        if (userId == Guid.Empty) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+
+        var chosenMonthRecords = await dbContext.Records
+            .Where(record =>
+                record.IdentityUserId == Guid.Parse(userId.ToString()) &&
+                record.Date.Year == chosenYear &&
+                record.Date.Month == chosenMonth)
+            .ToListAsync();
+        var totalTime = chosenMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+        return new TimeFormatDto() {
+            Hours = (int)totalTime.TotalHours,
+            Minutes = totalTime.Minutes
+        };
+    }
+}
+    
+    
+    
+    
+    
+    
+    
+    
+    // public async Task<TimeFormatDto> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] string userId) {
+    //     if (string.IsNullOrEmpty(userId)) {
+    //         throw new UnauthorizedAccessException("User not found");
+    //     }
+    //     var actualYear = DateTime.Now.Year;
+    //     var startMinistryYear = new DateOnly(actualYear - 1, 9, 1);
+    //     var endMinistryYear = new DateOnly(actualYear, 8, 31);
+    //     var actualYearRecords = await dbContext.Records
+    //         .Where(record =>
+    //             record.IdentityUserId == userId &&
+    //             record.Date >= startMinistryYear &&
+    //             record.Date <= endMinistryYear)
+    //         .ToListAsync();
+    //     var totalTime = actualYearRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+    //     return new TimeFormatDto() 
+    //     { 
+    //         Hours = (int)totalTime.TotalHours,
+    //         Minutes = totalTime.Minutes
+    //     };
+    // }
+    
 
     
     // public async Task<double> YearRecordProgressQueryAsync([FromQuery] string userId) {
@@ -74,14 +254,6 @@ public class RecordTimeService {
     //     return Math.Round(percentageYearProgress);
     // }
     
-    public async Task<double> YearRecordProgressQueryAsync([FromQuery] Guid userId) {
-        var yearTotalRecord = await SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
-        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
-        var yearHoursQuote = monthTimeGoal * 12.0;
-        var percentageYearProgress = (hoursAndMinutes * 100.0) / yearHoursQuote;
-        return Math.Round(percentageYearProgress);
-    }
 
     
     // public async Task<TimeFormatDto> YearRemainingTimeQueryAsync([FromQuery] string userId) {
@@ -101,22 +273,6 @@ public class RecordTimeService {
     //     };
     // }
     
-    public async Task<TimeFormatDto> YearRemainingTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty) {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var yearTotalRecord = await SumActualMinistryYearTotalRecordTimeQueryAsync(userId);
-        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var yearHoursQuote = monthTimeGoal * 12.0;
-        var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
-        var remainingTime = yearHoursQuote - hoursAndMinutes;
-
-        return new TimeFormatDto()
-        { 
-            Hours = (int)remainingTime,
-            Minutes = (int)((remainingTime - (int)remainingTime) * 60)
-        };
-    }
 
     
     // public async Task<TimeFormatDto> SumActualMonthTotalRecordTimeQueryAsync([FromQuery] string userId) {
@@ -163,28 +319,6 @@ public class RecordTimeService {
     //     };
     // }
 
-    public async Task<TimeFormatDto> SumActualMonthTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var actualMonth = DateTime.Now.Month;
-        var actualYear = DateTime.Now.Year;
-        var userIdString = userId.ToString();
-        var actualMonthRecords = await dbContext.Records
-            .Where(record =>
-                record.IdentityUserId == Guid.Parse(userIdString) &&
-                record.Date.Year == actualYear &&
-                record.Date.Month == actualMonth)
-            .ToListAsync();
-    
-        var totalTime = actualMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
-        return new TimeFormatDto() 
-        { 
-            Hours = (int)totalTime.TotalHours,
-            Minutes = totalTime.Minutes
-        };
-    }
     
     // public async Task<double> MonthRecordProgressQueryAsync([FromQuery] string userId) {
     //     if (string.IsNullOrEmpty(userId))
@@ -198,17 +332,6 @@ public class RecordTimeService {
     //     return Math.Round(percentageMonthProgress);
     // }
     
-    public async Task<double> MonthRecordProgressQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
-        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var hoursAndMinutes = monthTotalRecord.Hours + (monthTotalRecord.Minutes / 60.0);
-        var percentageMonthProgress = (hoursAndMinutes * 100.0) / monthTimeGoal;
-        return Math.Round(percentageMonthProgress);
-    }
 
     
     // public async Task<TimeFormatDto> MonthRemainingTimeQueryAsync([FromQuery] string userId) {
@@ -243,21 +366,6 @@ public class RecordTimeService {
     //     };
     // }
 
-    public async Task<TimeFormatDto> MonthRemainingTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
-        var hoursAndMinutes = monthTotalRecord.Hours + (monthTotalRecord.Minutes / 60.0);
-        var remainingTime = monthTimeGoal - hoursAndMinutes;
-        return new TimeFormatDto()
-        { 
-            Hours = (int)remainingTime,
-            Minutes = (int)((remainingTime - (int)remainingTime) * 60)
-        };
-    }
 
     
     // public async Task<TimeFormatDto> SumActualWeekTotalRecordTimeQueryAsync([FromQuery] string userId) {
@@ -350,36 +458,6 @@ public class RecordTimeService {
     //     };
     // }
     
-    public async Task<TimeFormatDto> SumActualWeekTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        // Převedeme DayOfWeek na hodnotu, kde pondělí = 1, neděle = 7
-        var actualDay = DateTime.Now;
-        int dayOfWeek;
-        if (actualDay.DayOfWeek == DayOfWeek.Sunday) {
-            dayOfWeek = 7;
-        } else {
-            dayOfWeek = (int)actualDay.DayOfWeek;
-        }
-        // Vypočítáme pondělí daného týdne
-        var startOfWeek = actualDay.AddDays(-(dayOfWeek - 1)).Date;
-        var endOfWeek = startOfWeek.AddDays(7);
-        var userIdString = userId.ToString();
-        var weekRecords = await dbContext.Records
-            .Where(record =>
-                record.IdentityUserId == Guid.Parse(userIdString) &&
-                record.Date >= DateOnly.FromDateTime(startOfWeek) &&
-                record.Date < DateOnly.FromDateTime(endOfWeek))
-            .ToListAsync();
-        var totalTime = weekRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
-        return new TimeFormatDto() 
-        { 
-            Hours = (int)totalTime.TotalHours,
-            Minutes = totalTime.Minutes
-        };
-    }
 
 
     
@@ -395,17 +473,6 @@ public class RecordTimeService {
     //     return Math.Round(percentageWeekProgress);
     // }
     
-    public async Task<double> WeekRecordProgressQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty) {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var weekTimeQuote = monthTimeGoal / 4.0; 
-        var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
-        var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
-        var percentageWeekProgress = (hoursAndMinutes * 100.0) / weekTimeQuote;
-        return Math.Round(percentageWeekProgress);
-    }
 
     
     // public async Task<TimeFormatDto> WeekRemainingTimeQueryAsync([FromQuery] string userId) {
@@ -425,22 +492,6 @@ public class RecordTimeService {
     //     };
     // }
     
-    public async Task<TimeFormatDto> WeekRemainingTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
-            throw new UnauthorizedAccessException("User not found");
-        }
-        var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
-        var weekTimeQuote = monthTimeGoal / 4.0; 
-        var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
-        var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
-        var remainingTime = weekTimeQuote - hoursAndMinutes;
-        return new TimeFormatDto()
-        { 
-            Hours = (int)remainingTime,
-            Minutes = (int)((remainingTime - (int)remainingTime) * 60)
-        };
-    }
 
 
     // public async Task<int> GetMonthTimeGoalAsyncQuery([FromQuery] string userId) {
@@ -457,20 +508,6 @@ public class RecordTimeService {
     //     return monthTimeGoal;
     // }
     
-    public async Task<int> GetMonthTimeGoalAsyncQuery([FromQuery] Guid userId) {
-        if (userId == Guid.Empty) {
-            throw new UnauthorizedAccessException("User not found");
-        }
-
-        var monthTimeGoal = await userManager.Users
-            .Where(user => user.Id == userId)
-            .Select(user => user.MonthTimeGoal)
-            .FirstOrDefaultAsync() ?? 0;
-        // if (monthTimeGoal == 0) {
-        //     throw new InvalidOperationException("Month time goal cannot be zero");
-        // }
-        return monthTimeGoal;
-    }
 
     
     // public async Task<TimeFormatDto> SumTotalRecordTimeAsync() {
@@ -697,4 +734,3 @@ public class RecordTimeService {
     //         Minutes = totalTime.Minutes
     //     };
     // }
-}

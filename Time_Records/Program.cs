@@ -33,7 +33,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
 
 // podpora GUID
 builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options => {
+        // povolene znaky a mezera pro username
         options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
+        options.User.RequireUniqueEmail = true;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
