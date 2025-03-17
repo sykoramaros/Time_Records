@@ -21,7 +21,8 @@ public class RecordService {
         this.userManager = userManager;
     }
 
-    public RecordService(ApplicationDbContext dbContext, UserManager<AppUser> userManager, IHttpContextAccessor httpContextAccessor) {
+    public RecordService(ApplicationDbContext dbContext, UserManager<AppUser> userManager,
+        IHttpContextAccessor httpContextAccessor) {
         this.dbContext = dbContext;
         this.userManager = userManager;
         this.httpContextAccessor = httpContextAccessor;
@@ -52,17 +53,18 @@ public class RecordService {
             IdentityUserId = recordDto.IdentityUserId
         };
     }
-    
+
     public async Task CreateRecordQueryAsync([FromQuery] Guid userId, RecordDto recordDto) {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
+
         var record = DtoToModel(recordDto);
         record.IdentityUserId = userId;
         await dbContext.Records.AddAsync(record);
         await dbContext.SaveChangesAsync();
     }
-    
+
 
     internal async Task<IEnumerable<RecordDto>> GetAllRecords() {
         // var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
@@ -71,43 +73,50 @@ public class RecordService {
         if (userId == null) {
             throw new UnauthorizedAccessException("User not found");
         }
+
         return dbContext.Records
             .Where(r => r.IdentityUserId == Guid.Parse(userId))
             .Select(ModelToDto)
             .AsEnumerable();
     }
-    
+
     internal async Task<IEnumerable<RecordDto>> GetAllRecordsQuery([FromQuery] Guid userId) {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
+
         return dbContext.Records
             .Where(r => r.IdentityUserId == userId)
             .Select(ModelToDto)
             .AsEnumerable();
     }
-    
+
     internal async Task<RecordDto> GetRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date) {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
+
         var recordToEdit = await dbContext.Records
             .FirstOrDefaultAsync(r => r.IdentityUserId == userId && r.Date == date);
         if (recordToEdit == null) {
             return null;
         }
+
         return ModelToDto(recordToEdit);
     }
-    
-    internal async Task EditRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date, RecordDto editedRecord) {
+
+    internal async Task EditRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date,
+        RecordDto editedRecord) {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
+
         var recordToEdit = await dbContext.Records
             .FirstOrDefaultAsync(r => r.IdentityUserId == userId && r.Date == date);
         if (recordToEdit == null) {
             return;
         }
+
         recordToEdit.Date = editedRecord.Date;
         recordToEdit.RecordTime = editedRecord.RecordTime;
         recordToEdit.RecordStudy = editedRecord.RecordStudy;
@@ -115,10 +124,12 @@ public class RecordService {
         dbContext.Update(recordToEdit);
         await dbContext.SaveChangesAsync();
     }
+
     internal async Task DeleteRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date) {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
+
         var recordToDelete = await dbContext.Records
             .FirstOrDefaultAsync(r => r.IdentityUserId == userId && r.Date == date);
         if (recordToDelete != null) {
@@ -126,10 +137,24 @@ public class RecordService {
             await dbContext.SaveChangesAsync();
         }
     }
+
+    internal async Task DeleteAllRecordsQueryAsync([FromQuery] Guid userId) {
+        if (userId == Guid.Empty) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+
+        var allRecordsToDelete = await dbContext.Records
+            .Where(r => r.IdentityUserId == userId)
+            .ToListAsync();
+        if (allRecordsToDelete != null) {
+            dbContext.Records.RemoveRange(allRecordsToDelete);
+            await dbContext.SaveChangesAsync();
+        }
+    }
 }
 
-    
-    // public async Task CreateRecordAsync(RecordDto recordDto) {
+
+// public async Task CreateRecordAsync(RecordDto recordDto) {
     //     var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
     //     if (user == null) {
     //         throw new UnauthorizedAccessException("User not found");

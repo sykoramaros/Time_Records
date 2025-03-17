@@ -36,8 +36,7 @@ public class RecordTimeService {
                 record.Date <= endMinistryYear)
             .ToListAsync();
         var totalTime = actualYearRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
-        return new TimeFormatDto() 
-        { 
+        return new TimeFormatDto() { 
             Hours = (int)totalTime.TotalHours,
             Minutes = totalTime.Minutes
         };
@@ -62,16 +61,14 @@ public class RecordTimeService {
         var hoursAndMinutes = yearTotalRecord.Hours + (yearTotalRecord.Minutes / 60.0);
         var remainingTime = yearHoursQuote - hoursAndMinutes;
 
-        return new TimeFormatDto()
-        { 
+        return new TimeFormatDto() { 
             Hours = (int)remainingTime,
             Minutes = (int)((remainingTime - (int)remainingTime) * 60)
         };
     }
     
     public async Task<TimeFormatDto> SumActualMonthTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
         var actualMonth = DateTime.Now.Month;
@@ -83,18 +80,15 @@ public class RecordTimeService {
                 record.Date.Year == actualYear &&
                 record.Date.Month == actualMonth)
             .ToListAsync();
-    
         var totalTime = actualMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
-        return new TimeFormatDto() 
-        { 
+        return new TimeFormatDto() { 
             Hours = (int)totalTime.TotalHours,
             Minutes = totalTime.Minutes
         };
     }
     
     public async Task<double> MonthRecordProgressQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
         var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
@@ -105,24 +99,21 @@ public class RecordTimeService {
     }
     
     public async Task<TimeFormatDto> MonthRemainingTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
         var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
         var monthTotalRecord = await SumActualMonthTotalRecordTimeQueryAsync(userId);
         var hoursAndMinutes = monthTotalRecord.Hours + (monthTotalRecord.Minutes / 60.0);
         var remainingTime = monthTimeGoal - hoursAndMinutes;
-        return new TimeFormatDto()
-        { 
+        return new TimeFormatDto() { 
             Hours = (int)remainingTime,
             Minutes = (int)((remainingTime - (int)remainingTime) * 60)
         };
     }
     
     public async Task<TimeFormatDto> SumActualWeekTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
         // Převedeme DayOfWeek na hodnotu, kde pondělí = 1, neděle = 7
@@ -144,8 +135,7 @@ public class RecordTimeService {
                 record.Date < DateOnly.FromDateTime(endOfWeek))
             .ToListAsync();
         var totalTime = weekRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
-        return new TimeFormatDto() 
-        { 
+        return new TimeFormatDto() { 
             Hours = (int)totalTime.TotalHours,
             Minutes = totalTime.Minutes
         };
@@ -164,8 +154,7 @@ public class RecordTimeService {
     }
     
     public async Task<TimeFormatDto> WeekRemainingTimeQueryAsync([FromQuery] Guid userId) {
-        if (userId == Guid.Empty)
-        {
+        if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
         var monthTimeGoal = await GetMonthTimeGoalAsyncQuery(userId);
@@ -173,8 +162,7 @@ public class RecordTimeService {
         var weekTotalRecord = await SumActualWeekTotalRecordTimeQueryAsync(userId);
         var hoursAndMinutes = weekTotalRecord.Hours + (weekTotalRecord.Minutes / 60.0);
         var remainingTime = weekTimeQuote - hoursAndMinutes;
-        return new TimeFormatDto()
-        { 
+        return new TimeFormatDto() { 
             Hours = (int)remainingTime,
             Minutes = (int)((remainingTime - (int)remainingTime) * 60)
         };
@@ -184,7 +172,6 @@ public class RecordTimeService {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
-
         var monthTimeGoal = await userManager.Users
             .Where(user => user.Id == userId)
             .Select(user => user.MonthTimeGoal)
@@ -200,7 +187,6 @@ public class RecordTimeService {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
-
         var chosenMonthRecords = await dbContext.Records
             .Where(record =>
                 record.IdentityUserId == Guid.Parse(userId.ToString()) &&

@@ -13,7 +13,7 @@ using Time_Records.Models;
 namespace Time_Records.Services;
 
 public class GoogleAccountService : IGoogleAccountService {
-    private ApplicationDbContext dbContext;
+    private readonly ApplicationDbContext dbContext;
     private readonly IConfiguration configuration;
     private UserManager<AppUser> userManager;
 
@@ -32,7 +32,7 @@ public class GoogleAccountService : IGoogleAccountService {
     public async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string googleToken) {
         try {
             var settings = new GoogleJsonWebSignature.ValidationSettings {
-                Audience = new[] { "680830179798-oquu7npstv9ofbpv781kq9usq7nfjqtg.apps.googleusercontent.com" }
+                Audience = ["680830179798-oquu7npstv9ofbpv781kq9usq7nfjqtg.apps.googleusercontent.com"]
             };
             return await GoogleJsonWebSignature.ValidateAsync(googleToken, settings);
         } catch (Exception ex) {
@@ -83,7 +83,8 @@ public class GoogleAccountService : IGoogleAccountService {
             GoogleId = payload.Subject,
             UserName = payload.Name,
             Email = payload.Email,
-            MonthTimeGoal = (monthTimeGoal == null || monthTimeGoal == 0) ? 15 : monthTimeGoal
+            MonthTimeGoal = (monthTimeGoal == null || monthTimeGoal == 0) ? 15 : monthTimeGoal,
+            SecurityStamp = Guid.NewGuid().ToString()
         };
         dbContext.Users.Add(newUser);
         await dbContext.SaveChangesAsync();

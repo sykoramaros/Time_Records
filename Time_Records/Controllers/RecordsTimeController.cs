@@ -14,7 +14,6 @@ public class RecordsTimeController : ControllerBase {
         this.recordTimeService = recordTimeService;
     }
     
-    
     [HttpGet("SumActualMinistryYearTotalRecordTimeQuery")]
 public async Task<ActionResult<TimeFormatDto>> SumActualMinistryYearTotalRecordTimeQueryAsync([FromQuery] Guid userId) {
     var sum = await recordTimeService.SumActualMinistryYearTotalRecordTimeQueryAsync(userId);

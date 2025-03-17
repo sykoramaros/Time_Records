@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,29 +7,26 @@ using Time_Records.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
+using Time_Records.Services;
 
 namespace Time_Records.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController : ControllerBase {
-    private UserManager<AppUser> userManager;
+    private readonly UserManager<AppUser> userManager;
     private IPasswordHasher<AppUser> passwordHasher;
     private IPasswordValidator<AppUser> passwordValidator;
     private IConfiguration configuration;
+    private readonly RecordService recordService;
 
-    public UsersController(UserManager<AppUser> userManager, IPasswordHasher<AppUser> passwordHasher, IPasswordValidator<AppUser> passwordValidator) {
+    public UsersController(UserManager<AppUser> userManager, IPasswordHasher<AppUser> passwordHasher, IPasswordValidator<AppUser> passwordValidator, IConfiguration configuration, RecordService recordService) {
         this.userManager = userManager;
         this.passwordHasher = passwordHasher;
         this.passwordValidator = passwordValidator;
+        this.configuration = configuration;
+        this.recordService = recordService;
     }
-
-    // public UsersController(UserManager<AppUser> userManager, IPasswordHasher<AppUser> passwordHasher, IPasswordValidator<AppUser> passwordValidator, IConfiguration configuration) {
-    //     this.userManager = userManager;
-    //     this.passwordHasher = passwordHasher;
-    //     this.passwordValidator = passwordValidator;
-    //     this.configuration = configuration;
-    // }
 
     [Authorize(Roles = "Admin")]
     [HttpGet("GetAllUsers")]
@@ -201,6 +199,16 @@ public class UsersController : ControllerBase {
         if (userToEdit == null) {
             return NotFound("User ID was not found");
         }
+        if (userToEdit.UserName == editedUser.UserName) {
+            return BadRequest("User with this name already exists");
+        }
+        if (userToEdit.Email != editedUser.Email) {
+            return BadRequest("User with this email is not exists");
+        }
+        if (userToEdit.PhoneNumber == editedUser.PhoneNumber && editedUser.PhoneNumber != "") {
+            return BadRequest("User with this phone number already exists");
+        }
+        
         userToEdit.UserName = editedUser.UserName;
         userToEdit.Email = editedUser.Email;
         userToEdit.PhoneNumber = editedUser.PhoneNumber;
@@ -213,13 +221,14 @@ public class UsersController : ControllerBase {
         }
     }
     
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     [HttpDelete("DeleteUser/{id}")]
     public async Task<IActionResult> DeleteUser(string id) {
         var userToDelete = await userManager.FindByIdAsync(id);
         if (userToDelete == null) {
             return NotFound("User not found");
         }
+        await recordService.DeleteAllRecordsQueryAsync(userToDelete.Id);
         IdentityResult result = await userManager.DeleteAsync(userToDelete);
         if (result.Succeeded) {
             return Ok();

@@ -9,7 +9,7 @@ namespace Time_Records.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class RecordsController : ControllerBase {
-    private RecordService recordService;
+    private readonly RecordService recordService;
 
     public RecordsController(RecordService recordService) {
         this.recordService = recordService;
@@ -34,7 +34,6 @@ public class RecordsController : ControllerBase {
         return Ok(records);
     }
     
-    
     [HttpGet("GetRecordByDateQuery")]
     public async Task<ActionResult<RecordDto>> GetRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date) {
         var record = await recordService.GetRecordByDateQueryAsync(userId, date);
@@ -53,7 +52,6 @@ public class RecordsController : ControllerBase {
     //     "description": "zkouska swagger s pocatecni nulou"
     // }
     
-    
     [HttpPost("CreateRecordQuery")]
     public async Task<ActionResult> CreateRecordQueryAsync([FromQuery] Guid userId, [FromBody] RecordDto recordDto) {
         if (!ModelState.IsValid) {
@@ -67,7 +65,6 @@ public class RecordsController : ControllerBase {
             return StatusCode(500, "An error occurred while creating the record: " + exception.Message);
         }
     }
-    
     
     [HttpPut("EditRecordByDateQuery")]
     public async Task<ActionResult> EditRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date, [FromBody] RecordDto editedRecord) {
@@ -87,6 +84,20 @@ public class RecordsController : ControllerBase {
     public async Task<ActionResult> DeleteRecordQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date) {
         try {
             await recordService.DeleteRecordByDateQueryAsync(userId, date);
+            return Ok();
+        }
+        catch (UnauthorizedAccessException) {
+            return Unauthorized();
+        }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [HttpDelete("DeleteAllRecordsQuery")]
+    public async Task<ActionResult> DeleteAllRecordsQueryAsync([FromQuery] Guid userId) {
+        try {
+            await recordService.DeleteAllRecordsQueryAsync(userId);
             return Ok();
         }
         catch (UnauthorizedAccessException) {
