@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Time_Records.DTO;
 using Time_Records.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.RegularExpressions;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Time_Records.Services;
@@ -28,7 +29,8 @@ public class UsersController : ControllerBase {
         this.recordService = recordService;
     }
 
-    [Authorize(Roles = "Admin")]
+    [AllowAnonymous]
+    // [Authorize(Roles = "Admin")]
     [HttpGet("GetAllUsers")]
     public async Task<IActionResult> GetAllUsers() {
         var users = await userManager.Users.ToListAsync();
@@ -193,24 +195,44 @@ public class UsersController : ControllerBase {
             throw new UnauthorizedAccessException("No user is found");
         }
         var userToEdit = await userManager.FindByIdAsync(userId.ToString());
-        // var userToEdit = await userManager.Users
-        //     .Where(user => user.Id == userId)
-            // .FirstOrDefaultAsync();
         if (userToEdit == null) {
             return NotFound("User ID was not found");
         }
-        if (userToEdit.UserName == editedUser.UserName) {
-            return BadRequest("User with this name already exists");
+        if(editedUser.UserName == userToEdit.UserName &&    // je zadano co zmenit?
+           editedUser.PhoneNumber == userToEdit.PhoneNumber &&
+           editedUser.MonthTimeGoal == userToEdit.MonthTimeGoal) {
+            return BadRequest("No entered data to change");
         }
-        if (userToEdit.Email != editedUser.Email) {
+        if (editedUser.UserName == "" &&    // je vubec neco zadano?
+            editedUser.PhoneNumber == "" &&
+            editedUser.MonthTimeGoal == null) {
+            return BadRequest("No entered data to change");
+        }
+        if (editedUser.PhoneNumber != "") {     // pokud je zadano cislo obsahuje pouze cislice nebo + a ne pismena?
+            if (Regex.IsMatch(editedUser.PhoneNumber, @"^[\d+]+$") == false) {
+                return BadRequest("Phone number is not valid");
+            }
+        }
+        var existingUserEmailCheck = await userManager.Users    // nema stejny email uz nekdo jiny?
+            .Where(user => user.Email == editedUser.Email && user.Id != userId)
+            .FirstOrDefaultAsync();
+        if (existingUserEmailCheck != null) {
+            return BadRequest("User with this email already exists");
+        }
+        if (userToEdit.Email != editedUser.Email) {     // ma uzivatel shodny email v databazi?
             return BadRequest("User with this email is not exists");
         }
-        if (userToEdit.PhoneNumber == editedUser.PhoneNumber && editedUser.PhoneNumber != "") {
+        var existingPhoneNumberCheck = await userManager.Users  // nema stejne telefonni cislo uz nekdo jiny?
+            .Where(user => user.PhoneNumber == editedUser.PhoneNumber && user.Id != userId && user.PhoneNumber != "")
+            .FirstOrDefaultAsync();
+        if (existingPhoneNumberCheck != null) {
             return BadRequest("User with this phone number already exists");
         }
-        
+        if (userToEdit.SecurityStamp == "") {  // nema uzivatel prazdny SecurityStamp? Pokud ano, vygeneruj novy
+            await userManager.UpdateSecurityStampAsync(userToEdit);
+        }
         userToEdit.UserName = editedUser.UserName;
-        userToEdit.Email = editedUser.Email;
+        // userToEdit.Email = editedUser.Email;
         userToEdit.PhoneNumber = editedUser.PhoneNumber;
         userToEdit.MonthTimeGoal = editedUser.MonthTimeGoal == null || editedUser.MonthTimeGoal == 0 ? 15 : editedUser.MonthTimeGoal;
         IdentityResult result = await userManager.UpdateAsync(userToEdit);
