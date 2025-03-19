@@ -58,7 +58,11 @@ builder.Services.ConfigureApplicationCookie(options => {
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// povoleni anotaci ve Swaggeru
+builder.Services.AddSwaggerGen(options => {
+    options.EnableAnnotations();
+});
 
 // Nesmíš použít AllowAnyOrigin() spolu s AllowCredentials(), protože to prohlížeč nepovolí.
 builder.Services.AddCors(options => {

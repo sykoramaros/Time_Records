@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Time_Records.DTO;
 using Time_Records.Models;
 using Time_Records.Services;
@@ -49,16 +51,37 @@ public class GoogleAccountController : ControllerBase {
         return Ok("Token is valid");
     }
     
+    // [AllowAnonymous]
+    // [HttpPost("RegisterNewUserFromGoogleAsync")]
+    // public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] GoogleAuthDto googleAuthDto) {
+    //     if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
+    //         return BadRequest("Token is missing");
+    //     }
+    //     try {
+    //         var user = await iGoogleAccountService.RegisterNewUserFromGoogleAsync(
+    //             googleAuthDto.IdToken,
+    //             googleAuthDto.MonthTimeGoal);
+    //         return Ok(new {
+    //             user.Id,
+    //             user.UserName,
+    //             user.Email,
+    //             user.GoogleId,
+    //             user.MonthTimeGoal
+    //         });
+    //     } catch (Exception ex) {
+    //         return BadRequest(ex.Message);
+    //     }
+    // }
+    
     [AllowAnonymous]
     [HttpPost("RegisterNewUserFromGoogleAsync")]
-    public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] GoogleAuthDto googleAuthDto) {
-        if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
+    public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] AppUserDto appUserDto) {
+        if (appUserDto == null || string.IsNullOrEmpty(appUserDto.ImportedGoogleLoginToken)) {
             return BadRequest("Token is missing");
         }
         try {
             var user = await iGoogleAccountService.RegisterNewUserFromGoogleAsync(
-                googleAuthDto.IdToken,
-                googleAuthDto.MonthTimeGoal);
+                appUserDto.ImportedGoogleLoginToken);
             return Ok(new {
                 user.Id,
                 user.UserName,
@@ -71,19 +94,41 @@ public class GoogleAccountController : ControllerBase {
         }
     }
     
+    // [AllowAnonymous]
+    // [HttpPost("GoogleLogin")]
+    // public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthDto googleAuthDto) {
+    //     if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
+    //         return BadRequest("Token is missing");
+    //     }
+    //     var googleAuthLoginDto = await iGoogleAccountService.GoogleLoginToken(googleAuthDto.IdToken);
+    //     if (googleAuthLoginDto == null) {
+    //         return BadRequest("User not found or token creation failed");
+    //     }
+    //     return Ok(new {
+    //         token = googleAuthLoginDto.Token,
+    //         expiration = googleAuthLoginDto.Expiration
+    //     });
+    // }
+    
     [AllowAnonymous]
     [HttpPost("GoogleLogin")]
-    public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthDto googleAuthDto) {
-        if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
+    [SwaggerOperation(
+        Summary = "Returns user data through Google Id Login Token",
+        Description = "As input data is needed onlly importedGoogleLoginToken from OAuth2 google token"
+    )]
+    public async Task<IActionResult> GoogleLogin([FromBody] AppUserDto appUserDto) {
+        if (appUserDto == null || string.IsNullOrEmpty(appUserDto.ImportedGoogleLoginToken)) {
             return BadRequest("Token is missing");
         }
-        var googleAuthLoginDto = await iGoogleAccountService.GoogleLoginToken(googleAuthDto.IdToken);
-        if (googleAuthLoginDto == null) {
-            return BadRequest("User not found or token creation failed");
+
+        var importedGoogleLoginToken = await iGoogleAccountService.GoogleLoginToken(appUserDto.ImportedGoogleLoginToken);
+        if (importedGoogleLoginToken == null) {
+            return BadRequest("User not found or Google Id Login Token creation failed");
         }
+        
         return Ok(new {
-            token = googleAuthLoginDto.Token,
-            expiration = googleAuthLoginDto.Expiration
+            exportedGoogleLoginToken = appUserDto.ImportedGoogleLoginToken,
+            googleLoginExpiration = appUserDto.GoogleLoginExpiration
         });
     }
 }

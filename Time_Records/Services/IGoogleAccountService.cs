@@ -5,6 +5,6 @@ using Time_Records.Models;
 namespace Time_Records.Services;
 
 public interface IGoogleAccountService {
-    Task<AppUser> RegisterNewUserFromGoogleAsync(string idToken, int? monthTimeGoal = null);
-    Task<GoogleAuthLoginDto> GoogleLoginToken(string idToken);
+    Task<AppUser> RegisterNewUserFromGoogleAsync(string importedGoogleLoginToken);
+    Task<AppUserDto> GoogleLoginToken(string importedGoogleLoginToken);
 }

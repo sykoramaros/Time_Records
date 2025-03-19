@@ -29,12 +29,12 @@ public class GoogleAccountService : IGoogleAccountService {
     }
 
     // verifikace google tokenu
-    public async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string googleToken) {
+    public async Task<GoogleJsonWebSignature.Payload?> VerifyGoogleToken(string importedGoogleLoginToken) {
         try {
             var settings = new GoogleJsonWebSignature.ValidationSettings {
                 Audience = ["680830179798-oquu7npstv9ofbpv781kq9usq7nfjqtg.apps.googleusercontent.com"]
             };
-            return await GoogleJsonWebSignature.ValidateAsync(googleToken, settings);
+            return await GoogleJsonWebSignature.ValidateAsync(importedGoogleLoginToken, settings);
         } catch (Exception ex) {
             Console.WriteLine($"Google toen veryfication failed: {ex.Message}");
             return null;
@@ -70,20 +70,21 @@ public class GoogleAccountService : IGoogleAccountService {
         }
     }
 
-    public async Task<AppUser> RegisterNewUserFromGoogleAsync(string idToken, int? monthTimeGoal = null) {
-        var payload = await VerifyGoogleToken(idToken);
+    public async Task<AppUser> RegisterNewUserFromGoogleAsync(string importedGoogleLoginToken) {
+        var payload = await VerifyGoogleToken(importedGoogleLoginToken);
         if (payload == null) {
             throw new Exception("Google token veryfication failed");
         }
         var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.GoogleId == payload.Subject);
         if (existingUser != null) {
             return existingUser;
-        }
+        }   
         var newUser = new AppUser {
             GoogleId = payload.Subject,
             UserName = payload.Name,
             Email = payload.Email,
-            MonthTimeGoal = (monthTimeGoal == null || monthTimeGoal == 0) ? 15 : monthTimeGoal,
+            // MonthTimeGoal = (monthTimeGoal == null || monthTimeGoal == 0) ? 15 : monthTimeGoal,
+            MonthTimeGoal = 15,
             SecurityStamp = Guid.NewGuid().ToString()
         };
         dbContext.Users.Add(newUser);
@@ -91,15 +92,15 @@ public class GoogleAccountService : IGoogleAccountService {
         return newUser;
     }
 
-    public async Task<GoogleAuthLoginDto> GoogleLoginToken(string idToken) {
-        var payload = await VerifyGoogleToken(idToken);
+    public async Task<AppUserDto> GoogleLoginToken(string importedGoogleLoginToken) {
+        var payload = await VerifyGoogleToken(importedGoogleLoginToken);
         if (payload == null) {
             throw new Exception("Google token veryfication failed");
         }
-
+        // google id se oznacuje jako Sub nebo Subject
         var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.GoogleId == payload.Subject);
         if (existingUser == null) {
-            var newUser = await RegisterNewUserFromGoogleAsync(idToken, 15);
+            var newUser = await RegisterNewUserFromGoogleAsync(importedGoogleLoginToken);
             existingUser = newUser;
             // return GenerateLoginToken(newUser);
         }
@@ -130,13 +131,13 @@ public class GoogleAccountService : IGoogleAccountService {
             expires: expires,
             signingCredentials: credentials);
         
-        var googleAuthLoginDto = new GoogleAuthLoginDto {
-            Token = new JwtSecurityTokenHandler().WriteToken(token),
-            Expiration = expires
+        var appUserDto = new AppUserDto() {
+            ImportedGoogleLoginToken = new JwtSecurityTokenHandler().WriteToken(token),
+            GoogleLoginExpiration = expires
         };
-        Console.WriteLine($"Token: {googleAuthLoginDto.Token}, Expiration: {googleAuthLoginDto.Expiration}");
+        Console.WriteLine($"Token: {appUserDto.ImportedGoogleLoginToken}, Expiration: {appUserDto.GoogleLoginExpiration}");
 
-        return googleAuthLoginDto;
+        return appUserDto;
     }
     // Logout na backendu neni nutny ale na frontendu byt muze
 }
