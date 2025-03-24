@@ -21,6 +21,7 @@ public class AccountController : ControllerBase {
     private RoleManager<IdentityRole>? roleManager;
     private SignInManager<AppUser> signInManager;
     private IConfiguration configuration;
+    private ApplicationDbContext dbContext;
 
 
 
@@ -99,13 +100,14 @@ public class AccountController : ControllerBase {
     //     }
     //     return BadRequest(new { message = "Invalid model state", errors = ModelState });
     // }
-    
-    
+
+
+
     [AllowAnonymous]
     [HttpPost("Jwt-login")]
 public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
     if (ModelState.IsValid) {
-        AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName);
+        AppUser appUser = await userManager.FindByNameAsync(loginDto.UserName) ?? await userManager.FindByEmailAsync(loginDto.Email);
         if (appUser != null) {
             var signInResult = await signInManager.PasswordSignInAsync(
                 appUser,
@@ -113,14 +115,22 @@ public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
                 isPersistent: false,
                 lockoutOnFailure: false
             );
+            
+            if (appUser.UserName == null) {
+                return Unauthorized(new { message = "User has no username" });
+            }
+            if (appUser.Email == null) {
+                return Unauthorized(new { message = "User has no email" });
+            }
+            
             if (signInResult.Succeeded) {
                 var claims = new List<Claim> {
-                    new Claim("Id", appUser.Id.ToString()), // Převod Guid na string
-                    new Claim(ClaimTypes.Name, appUser.UserName),
-                    new Claim(ClaimTypes.Email, appUser.Email),
-                    new Claim("GoogleId", appUser.GoogleId ?? ""),
-                    new Claim("PhoneNumber", appUser.PhoneNumber ?? ""),
-                    new Claim("MonthTimeGoal", appUser.MonthTimeGoal.ToString())
+                    new ("Id", appUser.Id.ToString()), // Převod Guid na string
+                    new (ClaimTypes.Name, appUser.UserName),
+                    new (ClaimTypes.Email, appUser.Email),
+                    new ("GoogleId", appUser.GoogleId ?? ""),
+                    new ("PhoneNumber", appUser.PhoneNumber ?? ""),
+                    new ("MonthTimeGoal", appUser.MonthTimeGoal.ToString())
                 };
                 var userRoles = await userManager.GetRolesAsync(appUser);
                 foreach (var role in userRoles) {

@@ -99,7 +99,7 @@ public class RecordService {
         var recordToEdit = await dbContext.Records
             .FirstOrDefaultAsync(r => r.IdentityUserId == userId && r.Date == date);
         if (recordToEdit == null) {
-            return null;
+            throw new UnauthorizedAccessException("Record not found");
         }
 
         return ModelToDto(recordToEdit);

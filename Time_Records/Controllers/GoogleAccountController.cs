@@ -42,14 +42,14 @@ public class GoogleAccountController : ControllerBase {
         this.googleAccountService = googleAccountService;
     }
 
-    [HttpPost("VerifyGoogleToken")]
-    public async Task<IActionResult> VerifyGoogleToken([FromBody] string googleToken) {
-        var payload = await googleAccountService.VerifyGoogleToken(googleToken);
-        if (payload == null) {
-            return Unauthorized("Token is not valid");
-        }
-        return Ok("Token is valid");
-    }
+    // [HttpPost("VerifyGoogleToken")]
+    // public async Task<IActionResult> VerifyGoogleToken([FromBody] string googleToken) {
+    //     var payload = await googleAccountService.VerifyGoogleToken(googleToken);
+    //     if (payload == null) {
+    //         return Unauthorized("Token is not valid");
+    //     }
+    //     return Ok("Token is valid");
+    // }
     
     // [AllowAnonymous]
     // [HttpPost("RegisterNewUserFromGoogleAsync")]
@@ -75,13 +75,13 @@ public class GoogleAccountController : ControllerBase {
     
     [AllowAnonymous]
     [HttpPost("RegisterNewUserFromGoogleAsync")]
-    public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] AppUserDto appUserDto) {
-        if (appUserDto == null || string.IsNullOrEmpty(appUserDto.ImportedGoogleLoginToken)) {
+    public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] GoogleLoginDto googleLoginDto) {
+        if (googleLoginDto == null || string.IsNullOrEmpty(googleLoginDto.ImportedGoogleLoginToken)) {
             return BadRequest("Token is missing");
         }
         try {
             var user = await iGoogleAccountService.RegisterNewUserFromGoogleAsync(
-                appUserDto.ImportedGoogleLoginToken);
+                googleLoginDto.ImportedGoogleLoginToken);
             return Ok(new {
                 user.Id,
                 user.UserName,
@@ -116,19 +116,19 @@ public class GoogleAccountController : ControllerBase {
         Summary = "Returns user data through Google Id Login Token",
         Description = "As input data is needed onlly importedGoogleLoginToken from OAuth2 google token"
     )]
-    public async Task<IActionResult> GoogleLogin([FromBody] AppUserDto appUserDto) {
-        if (appUserDto == null || string.IsNullOrEmpty(appUserDto.ImportedGoogleLoginToken)) {
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleLoginDto) {
+        if (googleLoginDto == null || string.IsNullOrEmpty(googleLoginDto.ImportedGoogleLoginToken)) {
             return BadRequest("Token is missing");
         }
 
-        var importedGoogleLoginToken = await iGoogleAccountService.GoogleLoginToken(appUserDto.ImportedGoogleLoginToken);
+        var importedGoogleLoginToken = await iGoogleAccountService.GoogleLoginToken(googleLoginDto.ImportedGoogleLoginToken);
         if (importedGoogleLoginToken == null) {
             return BadRequest("User not found or Google Id Login Token creation failed");
         }
         
         return Ok(new {
-            exportedGoogleLoginToken = appUserDto.ImportedGoogleLoginToken,
-            googleLoginExpiration = appUserDto.GoogleLoginExpiration
+            importedGoogleLoginToken = googleLoginDto.ImportedGoogleLoginToken,
+            googleLoginExpiration = googleLoginDto.GoogleLoginExpiration
         });
     }
 }
