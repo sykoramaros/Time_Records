@@ -40,15 +40,15 @@ public class GoogleAccountService : IGoogleAccountService {
                 Console.WriteLine("Google token validation failed.");
                 throw new Exception("Payload is null");
             }
-            if (payload.NotBeforeTimeSeconds.HasValue) {
-                var notBefore = DateTimeOffset.FromUnixTimeSeconds(payload.NotBeforeTimeSeconds.Value);
-                var now = DateTimeOffset.UtcNow;
-                if (notBefore > now) {
-                    var waitTime = (int)(notBefore - now).TotalMilliseconds + 1000;
-                    Console.WriteLine($"Waiting {waitTime} milliseconds...");
-                    await Task.Delay(waitTime);
-                }
-            }
+            // if (payload.NotBeforeTimeSeconds.HasValue) {
+            //     var notBefore = DateTimeOffset.FromUnixTimeSeconds(payload.NotBeforeTimeSeconds.Value);
+            //     var now = DateTimeOffset.UtcNow;
+            //     if (notBefore > now) {
+            //         var waitTime = (int)(notBefore - now).TotalMilliseconds + 1000;
+            //         Console.WriteLine($"Waiting {waitTime} milliseconds...");
+            //         await Task.Delay(waitTime);
+            //     }
+            // }
             Console.WriteLine("Google token validation completed.");
             return payload;
         } catch (Exception ex) {
@@ -158,10 +158,10 @@ public class GoogleAccountService : IGoogleAccountService {
             signingCredentials: credentials);
         
         var googleLoginDto = new GoogleLoginDto {
-            ImportedGoogleLoginToken = new JwtSecurityTokenHandler().WriteToken(token),
+            GoogleLoginToken = new JwtSecurityTokenHandler().WriteToken(token),
             GoogleLoginExpiration = expires
         };
-        Console.WriteLine($"Token: {googleLoginDto.ImportedGoogleLoginToken}, Expiration: {googleLoginDto.GoogleLoginExpiration}");
+        Console.WriteLine($"Token: {googleLoginDto.GoogleLoginToken}, Expiration: {googleLoginDto.GoogleLoginExpiration}");
         
         return googleLoginDto;
     }

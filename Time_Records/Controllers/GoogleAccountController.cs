@@ -76,12 +76,12 @@ public class GoogleAccountController : ControllerBase {
     [AllowAnonymous]
     [HttpPost("RegisterNewUserFromGoogleAsync")]
     public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] GoogleLoginDto googleLoginDto) {
-        if (googleLoginDto == null || string.IsNullOrEmpty(googleLoginDto.ImportedGoogleLoginToken)) {
+        if (googleLoginDto == null || string.IsNullOrEmpty(googleLoginDto.GoogleLoginToken)) {
             return BadRequest("Token is missing");
         }
         try {
             var user = await iGoogleAccountService.RegisterNewUserFromGoogleAsync(
-                googleLoginDto.ImportedGoogleLoginToken);
+                googleLoginDto.GoogleLoginToken);
             return Ok(new {
                 user.Id,
                 user.UserName,
@@ -117,18 +117,18 @@ public class GoogleAccountController : ControllerBase {
         Description = "As input data is needed onlly importedGoogleLoginToken from OAuth2 google token"
     )]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleLoginDto) {
-        if (googleLoginDto == null || string.IsNullOrEmpty(googleLoginDto.ImportedGoogleLoginToken)) {
+        if (googleLoginDto == null || string.IsNullOrEmpty(googleLoginDto.GoogleLoginToken)) {
             return BadRequest("Token is missing");
         }
-
-        var importedGoogleLoginToken = await iGoogleAccountService.GoogleLoginToken(googleLoginDto.ImportedGoogleLoginToken);
-        if (importedGoogleLoginToken == null) {
-            return BadRequest("User not found or Google Id Login Token creation failed");
+        try {
+            var authResult = await iGoogleAccountService.GoogleLoginToken(googleLoginDto.GoogleLoginToken);
+            if (authResult == null) {
+                return BadRequest("User not found or token creation failed");
+            }
+            authResult.Message = "Google login successful";
+            return Ok(authResult);
+        } catch (Exception ex) {
+            return BadRequest(ex.Message);
         }
-        
-        return Ok(new {
-            importedGoogleLoginToken = googleLoginDto.ImportedGoogleLoginToken,
-            googleLoginExpiration = googleLoginDto.GoogleLoginExpiration
-        });
     }
 }

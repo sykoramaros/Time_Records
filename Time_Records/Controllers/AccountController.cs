@@ -149,7 +149,7 @@ public async Task<IActionResult> JwtLogin([FromBody] LoginDto loginDto) {
                 return Ok(new {
                     token = tokenString,
                     message = "JWT Login successful",
-                    returnUrl = loginDto.ReturnUrl ?? "/"
+                    // returnUrl = loginDto.ReturnUrl ?? "/"
                 });
             }
             return Unauthorized(new { message = "Invalid credentials" });
