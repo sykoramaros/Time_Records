@@ -48,6 +48,18 @@
               "target": "Package",
               "version": "[1.69.0, )"
             },
+            "HotChocolate.AspNetCore": {
+              "target": "Package",
+              "version": "[16.0.0-p.4.4, )"
+            },
+            "HotChocolate.Data": {
+              "target": "Package",
+              "version": "[16.0.0-p.4.4, )"
+            },
+            "HotChocolate.Validation": {
+              "target": "Package",
+              "version": "[16.0.0-p.4.4, )"
+            },
             "Microsoft.AspNetCore.Authentication.Google": {
               "target": "Package",
               "version": "[8.0.13, )"

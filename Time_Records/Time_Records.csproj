@@ -9,6 +9,9 @@
 
     <ItemGroup>
         <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
+        <PackageReference Include="HotChocolate.AspNetCore" Version="16.0.0-p.4.4" />
+        <PackageReference Include="HotChocolate.Data" Version="16.0.0-p.4.4" />
+        <PackageReference Include="HotChocolate.Validation" Version="16.0.0-p.4.4" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.12" />

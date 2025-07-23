@@ -1,6 +1,4 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +6,15 @@ using Microsoft.IdentityModel.Tokens;
 using Time_Records;
 using Time_Records.Models;
 using Time_Records.Services;
+using HotChocolate.AspNetCore;
+using Time_Records.GraphQL;
+using Time_Records.GraphQL.Users.Queries;
+using Time_Records.GraphQL.Users.Mutations;
+using HotChocolate;
+using HotChocolate.Types;
+using Time_Records.GraphQL.Types;
+using Time_Records.GraphQL.Types.Inputs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +23,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IGoogleAccountService, GoogleAccountService>();
 builder.Services.AddScoped<GoogleAccountService>();
 builder.Services.AddScoped<RecordService>();
+builder.Services.AddScoped<RecordCreditTimeService>();
 builder.Services.AddScoped<RecordTimeService>();
 builder.Services.AddScoped<StudyService>();
 builder.Services.AddHttpContextAccessor();
@@ -92,47 +100,49 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// autentifikace pro Google
-// builder.Services.AddAuthentication(options => {
-//         options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//         options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-//     })
-//     .AddCookie(options => {
-//         options.Cookie.HttpOnly = true;
-//         options.Cookie.SameSite = SameSiteMode.Lax;
-//         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-//     })
-//     .AddGoogle(options => {
-//         options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-//         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-//         options.CallbackPath = "/api/Account/Google-login-callback";
-//         options.SaveTokens = true;
-//     });
+builder.Services.AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddTypeExtension<UserQueries>()
+    .AddMutationType<Mutation>()
+    .AddTypeExtension<UserMutations>()
+    .AddProjections()
+    .AddFiltering()
+    .AddSorting();
 
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
-    app.UseSwagger();
-    app.UseSwaggerUI(c => {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeRecords API V1");
-    });
+app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment()) {
     app.UseDeveloperExceptionPage();
 }
-
-app.UseHttpsRedirection();
 
 app.UseCors("MyCorsPolicy");
 
 app.UseRouting();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Swagger
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
+    app.UseSwagger();
+    app.UseSwaggerUI(c => {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeRecords API V1");
+    });
+}
+
+if (app.Environment.IsDevelopment()) {
+    app.MapGraphQL("/graphql")
+        .WithOptions(new GraphQLServerOptions {
+            Tool = { Enable = true }
+        });
+} else {
+    app.MapGraphQL("/graphql");
+}
 
 app.Run();

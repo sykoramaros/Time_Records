@@ -33,6 +33,7 @@ public class RecordService {
             Id = record.Id,
             Date = record.Date,
             RecordTime = record.RecordTime,
+            RecordCreditTime = record.RecordCreditTime,
             RecordStudy = record.RecordStudy,
             Description = record.Description,
             IdentityUserId = record.IdentityUserId
@@ -44,6 +45,7 @@ public class RecordService {
             Id = recordDto.Id,
             Date = recordDto.Date,
             RecordTime = recordDto.RecordTime,
+            RecordCreditTime = recordDto.RecordCreditTime,
             // pokud jsou zadany jen hodiny a minuty, automaticky se sekundy +00 pridaji 
             // RecordTime = recordDto.RecordTime.Seconds == 0 ?
             //     recordDto.RecordTime.Add(TimeSpan.FromSeconds(0)) :
@@ -58,7 +60,6 @@ public class RecordService {
         if (userId == Guid.Empty) {
             throw new UnauthorizedAccessException("User not found");
         }
-
         var record = DtoToModel(recordDto);
         record.IdentityUserId = userId;
         await dbContext.Records.AddAsync(record);
@@ -104,6 +105,22 @@ public class RecordService {
 
         return ModelToDto(recordToEdit);
     }
+    
+    internal async Task<RecordDto> GetRecordByChoosenMonthQueryAsync([FromQuery] Guid userId, [FromQuery] int chosenMonth, [FromQuery] int chosenYear) {
+        if (userId == Guid.Empty) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+
+        var chosenMonthRecords = await dbContext.Records
+            .FirstOrDefaultAsync(record =>
+                record.IdentityUserId == userId &&
+                record.Date.Year == chosenYear &&
+                record.Date.Month == chosenMonth);
+        if (chosenMonthRecords == null) {
+            throw new UnauthorizedAccessException("Record not found");
+        }
+        return ModelToDto(chosenMonthRecords);
+    }
 
     internal async Task EditRecordByDateQueryAsync([FromQuery] Guid userId, [FromQuery] DateOnly date,
         RecordDto editedRecord) {
@@ -119,6 +136,7 @@ public class RecordService {
 
         recordToEdit.Date = editedRecord.Date;
         recordToEdit.RecordTime = editedRecord.RecordTime;
+        recordToEdit.RecordCreditTime = editedRecord.RecordCreditTime;
         recordToEdit.RecordStudy = editedRecord.RecordStudy;
         recordToEdit.Description = editedRecord.Description;
         dbContext.Update(recordToEdit);

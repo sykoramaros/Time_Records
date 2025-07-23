@@ -67,6 +67,20 @@ public class StudyService {
             .SumAsync(record => record.RecordStudy ?? 0);
         return actualMonthStudies;
     }
+    
+    public async Task<int> SumChosenMonthRecordStudyQuery([FromQuery] Guid userId, [FromQuery] int chosenMonth, [FromQuery] int chosenYear) {
+        if (userId == Guid.Empty) {
+            throw new UnauthorizedAccessException("User not found");
+        }
+        var chosenMonthStudies = await dbContext.Records
+            .Where(record =>
+                record.IdentityUserId == userId &&
+                record.Date.Month == chosenMonth &&
+                record.Date.Year == chosenYear
+                )
+            .SumAsync(record => record.RecordStudy ?? 0);
+        return chosenMonthStudies;
+    }
 
     public async Task<int> SumActualWeekRecordStudyQuery([FromQuery] Guid userId) {
         if (userId == Guid.Empty) {

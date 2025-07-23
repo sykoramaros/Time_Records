@@ -43,6 +43,15 @@ public class RecordsController : ControllerBase {
         return Ok(record);
     }
     
+    [HttpGet("GetRecordByChoosenMonthQuery")]
+    public async Task<ActionResult<RecordDto>> GetRecordByChoosenMonthQueryAsync([FromQuery] Guid userId, [FromQuery] int chosenMonth, [FromQuery] int chosenYear) {
+        var record = await recordService.GetRecordByChoosenMonthQueryAsync(userId, chosenMonth, chosenYear);
+        if (record == null) {
+            return NotFound("Record not found");
+        }
+        return Ok(record);
+    }
+    
     // spravny json format
     // {
     //     "id": 0,

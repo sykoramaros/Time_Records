@@ -32,7 +32,17 @@ public class StudiesController : ControllerBase {
         }
         return Ok(actualMonthStudies);
     }
+    
+    [HttpGet("GetSumChosenMonthRecordStudyQuery")]
+    public async Task<ActionResult<int>> GetSumChosenMonthRecordStudyQuery(Guid userId, int chosenMonth, int chosenYear) {
+        var actualMonthStudies = await studyService.SumChosenMonthRecordStudyQuery( userId, chosenMonth, chosenYear);
+        if (actualMonthStudies == null) {
+            return NotFound("No records found");
+        }
+        return Ok(actualMonthStudies);
+    }
 
+        
     [HttpGet("GetSumActualWeekRecordStudyQuery")]
     public async Task<ActionResult<int>> GetSumActualWeekRecordStudyQuery(Guid userId) {
         var actualWeekStudies = await studyService.SumActualWeekRecordStudyQuery(userId);
