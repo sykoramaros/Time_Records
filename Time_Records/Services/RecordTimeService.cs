@@ -35,7 +35,7 @@ public class RecordTimeService {
                 record.Date >= startMinistryYear &&
                 record.Date <= endMinistryYear)
             .ToListAsync();
-        var totalTime = actualYearRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+        var totalTime = actualYearRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime ?? TimeSpan.Zero);
         return new TimeFormatDto() { 
             Hours = (int)totalTime.TotalHours,
             Minutes = totalTime.Minutes
@@ -80,7 +80,7 @@ public class RecordTimeService {
                 record.Date.Year == actualYear &&
                 record.Date.Month == actualMonth)
             .ToListAsync();
-        var totalTime = actualMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+        var totalTime = actualMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime ?? TimeSpan.Zero);
         return new TimeFormatDto() { 
             Hours = (int)totalTime.TotalHours,
             Minutes = totalTime.Minutes
@@ -134,7 +134,7 @@ public class RecordTimeService {
                 record.Date >= DateOnly.FromDateTime(startOfWeek) &&
                 record.Date < DateOnly.FromDateTime(endOfWeek))
             .ToListAsync();
-        var totalTime = weekRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+        var totalTime = weekRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime ?? TimeSpan.Zero);
         return new TimeFormatDto() { 
             Hours = (int)totalTime.TotalHours,
             Minutes = totalTime.Minutes
@@ -193,7 +193,7 @@ public class RecordTimeService {
                 record.Date.Year == chosenYear &&
                 record.Date.Month == chosenMonth)
             .ToListAsync();
-        var totalTime = chosenMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime);
+        var totalTime = chosenMonthRecords.Aggregate(TimeSpan.Zero, (sum, record) => sum + record.RecordTime ?? TimeSpan.Zero);
         return new TimeFormatDto() {
             Hours = (int)totalTime.TotalHours,
             Minutes = totalTime.Minutes

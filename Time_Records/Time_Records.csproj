@@ -38,4 +38,11 @@
         <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="GraphQL\Records\Mapper\" />
+      <Folder Include="GraphQL\Records\Mutations\" />
+      <Folder Include="GraphQL\Records\Payloads\" />
+      <Folder Include="GraphQL\Records\Queries\" />
+    </ItemGroup>
+
 </Project>
