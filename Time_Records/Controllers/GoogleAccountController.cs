@@ -23,17 +23,6 @@ public class GoogleAccountController : ControllerBase {
     // private RoleManager<IdentityRole>? roleManager;
     // private SignInManager<AppUser> signInManager;
     private GoogleAccountService googleAccountService;
-
-    // public GoogleAccountController(UserManager<AppUser> userManager, GoogleAccountService googleAccountService) {
-    //     this.userManager = userManager;
-    //     this.googleAccountService = googleAccountService;
-    // }
-
-    // public GoogleAccountController(UserManager<AppUser> userManager, IGoogleAccountService iGoogleAccountService, GoogleAccountService googleAccountService) {
-    //     this.userManager = userManager;
-    //     this.iGoogleAccountService = iGoogleAccountService;
-    //     this.googleAccountService = googleAccountService;
-    // }
     
     public GoogleAccountController(UserManager<AppUser> userManager, IConfiguration configuration, IGoogleAccountService iGoogleAccountService, GoogleAccountService googleAccountService) {
         this.userManager = userManager;
@@ -41,37 +30,6 @@ public class GoogleAccountController : ControllerBase {
         this.iGoogleAccountService = iGoogleAccountService;
         this.googleAccountService = googleAccountService;
     }
-
-    // [HttpPost("VerifyGoogleToken")]
-    // public async Task<IActionResult> VerifyGoogleToken([FromBody] string googleToken) {
-    //     var payload = await googleAccountService.VerifyGoogleToken(googleToken);
-    //     if (payload == null) {
-    //         return Unauthorized("Token is not valid");
-    //     }
-    //     return Ok("Token is valid");
-    // }
-    
-    // [AllowAnonymous]
-    // [HttpPost("RegisterNewUserFromGoogleAsync")]
-    // public async Task<IActionResult> RegisterNewUserFromGoogleAsync([FromBody] GoogleAuthDto googleAuthDto) {
-    //     if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
-    //         return BadRequest("Token is missing");
-    //     }
-    //     try {
-    //         var user = await iGoogleAccountService.RegisterNewUserFromGoogleAsync(
-    //             googleAuthDto.IdToken,
-    //             googleAuthDto.MonthTimeGoal);
-    //         return Ok(new {
-    //             user.Id,
-    //             user.UserName,
-    //             user.Email,
-    //             user.GoogleId,
-    //             user.MonthTimeGoal
-    //         });
-    //     } catch (Exception ex) {
-    //         return BadRequest(ex.Message);
-    //     }
-    // }
     
     [AllowAnonymous]
     [HttpPost("RegisterNewUserFromGoogleAsync")]
@@ -93,22 +51,6 @@ public class GoogleAccountController : ControllerBase {
             return BadRequest(ex.Message);
         }
     }
-    
-    // [AllowAnonymous]
-    // [HttpPost("GoogleLogin")]
-    // public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthDto googleAuthDto) {
-    //     if (googleAuthDto == null || string.IsNullOrEmpty(googleAuthDto.IdToken)) {
-    //         return BadRequest("Token is missing");
-    //     }
-    //     var googleAuthLoginDto = await iGoogleAccountService.GoogleLoginToken(googleAuthDto.IdToken);
-    //     if (googleAuthLoginDto == null) {
-    //         return BadRequest("User not found or token creation failed");
-    //     }
-    //     return Ok(new {
-    //         token = googleAuthLoginDto.Token,
-    //         expiration = googleAuthLoginDto.Expiration
-    //     });
-    // }
     
     [AllowAnonymous]
     [HttpPost("GoogleLogin")]

@@ -40,15 +40,6 @@ public class GoogleAccountService : IGoogleAccountService {
                 Console.WriteLine("Google token validation failed.");
                 throw new Exception("Payload is null");
             }
-            // if (payload.NotBeforeTimeSeconds.HasValue) {
-            //     var notBefore = DateTimeOffset.FromUnixTimeSeconds(payload.NotBeforeTimeSeconds.Value);
-            //     var now = DateTimeOffset.UtcNow;
-            //     if (notBefore > now) {
-            //         var waitTime = (int)(notBefore - now).TotalMilliseconds + 1000;
-            //         Console.WriteLine($"Waiting {waitTime} milliseconds...");
-            //         await Task.Delay(waitTime);
-            //     }
-            // }
             Console.WriteLine("Google token validation completed.");
             return payload;
         } catch (Exception ex) {
@@ -58,35 +49,6 @@ public class GoogleAccountService : IGoogleAccountService {
         }
     }
     
-    // public (string loginToken, DateTime expiration) GenerateLoginToken(AppUser user, int expirationMinutes = 30) {
-    //     try {
-    //         var tokenHandler = new JwtSecurityTokenHandler();
-    //         var key = Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT:SecretKey not found"));
-    //
-    //         // Kontrola délky klíče pro HMAC-SHA256
-    //         if (key.Length < 32) {
-    //             throw new ArgumentException("Secret key must be at least 32 bytes long for HMAC-SHA256");
-    //         }
-    //         var expiration = DateTime.UtcNow.AddMinutes(expirationMinutes);
-    //         var tokenDescriptor = new SecurityTokenDescriptor {
-    //             Subject = new ClaimsIdentity(new[] {
-    //                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-    //                 new Claim(ClaimTypes.Email, user.Email),
-    //                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-    //                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-    //             }),
-    //             Audience = "680830179798-oquu7npstv9ofbpv781kq9usq7nfjqtg.apps.googleusercontent.com",
-    //             Expires = expiration,
-    //             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-    //         };
-    //         var token = tokenHandler.CreateToken(tokenDescriptor);
-    //         return (tokenHandler.WriteToken(token), expiration);
-    //     }
-    //     catch (Exception ex) {
-    //         throw new InvalidOperationException("Failed to generate login token", ex);
-    //     }
-    // }
-
     public async Task<AppUser> RegisterNewUserFromGoogleAsync(string importedGoogleLoginToken) {
         var payload = await VerifyGoogleToken(importedGoogleLoginToken);
         if (payload == null) {
@@ -159,7 +121,11 @@ public class GoogleAccountService : IGoogleAccountService {
         
         var googleLoginDto = new GoogleLoginDto {
             GoogleLoginToken = new JwtSecurityTokenHandler().WriteToken(token),
-            GoogleLoginExpiration = expires
+            GoogleLoginExpiration = expires,
+            UserName = existingUser.UserName,  // propojeno s GoogleLoginDto
+            Email = existingUser.Email,  // propojeno s GoogleLoginDto
+            PhoneNumber = existingUser.PhoneNumber,  // propojeno s GoogleLoginDto
+                
         };
         Console.WriteLine($"Token: {googleLoginDto.GoogleLoginToken}, Expiration: {googleLoginDto.GoogleLoginExpiration}");
         
